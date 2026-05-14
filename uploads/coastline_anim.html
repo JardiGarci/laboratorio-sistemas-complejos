@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; width: 100%; height: 100%;
+    background: #f5f3f0; overflow: hidden;
+    font-family: 'JetBrains Mono', 'Courier New', monospace; }
+  .wrap { width: 100%; height: 100%; display: flex; flex-direction: column;
+    padding: 8px 14px 6px; }
+  .head { font-size: 13px; font-weight: 500; color: #5a5248; letter-spacing: 0.04em;
+    margin-bottom: 6px; }
+  .panels { display: flex; gap: 12px; flex: 1; min-height: 0; }
+  canvas { display: block; border-radius: 5px; border: 0.5px solid #d1d5db; }
+  .ctrl { display: flex; align-items: center; gap: 10px; margin-top: 6px; }
+  input[type=range] { flex: 1; accent-color: #b45309; height: 20px; cursor: pointer; }
+  .lbl { font-size: 13px; color: #6b7280; }
+  .sv  { font-size: 22px; font-weight: 600; color: #1a1816; }
+  .sk  { font-size: 13px; color: #94a3b8; margin-left: 3px; }
+  .dv  { font-size: 14px; color: #7c3aed; font-weight: 700; margin-left: 14px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">Paradoja de la costa · Richardson (1961) · longitud L(ε) según escala ε</div>
+  <div class="panels">
+    <canvas id="cC"></canvas>
+    <canvas id="cP"></canvas>
+  </div>
+  <div class="ctrl">
+    <span class="lbl">ε grande</span>
+    <input type="range" id="sl" min="0" max="39" step="1" value="0">
+    <span class="lbl">ε pequeño</span>
+    <span style="margin-left:8px;" class="sv" id="vEps">—</span><span class="sk">km</span>
+    <span style="margin-left:14px;" class="sv" id="vLen">—</span><span class="sk">km medidos</span>
+    <span class="dv" id="vD">D ≈ —</span>
+  </div>
+</div>
+<script>
+(function(){
+  /* ---- seeded LCG random ---- */
+  function mkRng(seed) {
+    let s = (seed | 0) % 2147483647;
+    if (s <= 0) s += 2147483646;
+    return () => { s = s * 16807 % 2147483647; return (s - 1) / 2147483646; };
+  }
+
+  /*
+   * Great Britain outline — clockwise from SE (Dover), closing at end.
+   * x ∈ [0,1] west→east,  y ∈ [0,1] north→south.
+   */
+  const BASE = [
+    [0.87, 0.87],  // Dover / Folkestone (SE)
+    [0.86, 0.80],  // Thames estuary
+    [0.84, 0.73],  // Essex / Norfolk
+    [0.82, 0.66],  // The Wash
+    [0.80, 0.60],  // Humber estuary
+    [0.74, 0.55],  // Scarborough / Tees
+    [0.68, 0.50],  // Tyne (Newcastle)
+    [0.63, 0.44],  // Berwick-upon-Tweed
+    [0.57, 0.40],  // Firth of Forth (S — Edinburgh)
+    [0.55, 0.36],  // Fife coast
+    [0.62, 0.26],  // Aberdeenshire (NE jut)
+    [0.54, 0.20],  // Moray Firth (Inverness)
+    [0.51, 0.13],  // Wick / Caithness
+    [0.46, 0.09],  // Dunnet Head (northernmost)
+    [0.30, 0.11],  // Cape Wrath (NW corner)
+    [0.17, 0.16],  // NW Highlands
+    [0.09, 0.27],  // Skye / Inner Minch
+    [0.07, 0.36],  // Ardnamurchan
+    [0.17, 0.46],  // Firth of Clyde (Kintyre)
+    [0.19, 0.54],  // Galloway (SW Scotland)
+    [0.31, 0.58],  // Cumbria / Solway Firth
+    [0.36, 0.63],  // Morecambe Bay
+    [0.33, 0.67],  // Formby / Liverpool
+    [0.22, 0.68],  // Anglesey / N Wales
+    [0.17, 0.75],  // Cardigan Bay
+    [0.14, 0.83],  // Pembrokeshire (SW Wales)
+    [0.27, 0.85],  // S Wales / Cardiff
+    [0.23, 0.89],  // N Somerset / Avonmouth
+    [0.19, 0.91],  // N Devon (Hartland)
+    [0.08, 0.97],  // Land's End (SW Cornwall)
+    [0.18, 1.00],  // Lizard Point (southernmost)
+    [0.32, 0.97],  // S Devon / Dartmouth
+    [0.47, 0.93],  // Portland Bill / Weymouth
+    [0.62, 0.91],  // Bournemouth / Christchurch
+    [0.75, 0.89],  // Selsey Bill / Chichester
+    [0.87, 0.87],  // Dover (close loop)
+  ];
+
+  /* midpoint displacement — H=0.75, sigma0=0.10, 7 iters → D_f ≈ 1.25 */
+  function displace(pts, iters, H, sigma0, seed) {
+    const r = mkRng(seed);
+    let res = pts.map(p => [p[0], p[1]]);
+    let sigma = sigma0;
+    const decay = Math.pow(2, -H);
+    for (let it = 0; it < iters; it++) {
+      const nxt = [];
+      for (let i = 0; i < res.length - 1; i++) {
+        nxt.push(res[i]);
+        nxt.push([
+          (res[i][0]+res[i+1][0])/2 + (r()-0.5)*sigma,
+          (res[i][1]+res[i+1][1])/2 + (r()-0.5)*sigma
+        ]);
+      }
+      nxt.push(res[res.length - 1]);
+      res = nxt; sigma *= decay;
+    }
+    return res;
+  }
+
+  const COAST = displace(BASE, 7, 0.75, 0.10, 42);
+  const NC = COAST.length;
+
+  /* ruler walk */
+  function walk(pts, eps) {
+    const steps = [[pts[0][0], pts[0][1]]];
+    let sx = pts[0][0], sy = pts[0][1];
+    for (let i = 1; i < pts.length; i++) {
+      const dx = pts[i][0]-sx, dy = pts[i][1]-sy;
+      if (Math.sqrt(dx*dx+dy*dy) >= eps) {
+        steps.push([pts[i][0], pts[i][1]]);
+        sx = pts[i][0]; sy = pts[i][1];
+      }
+    }
+    return steps;
+  }
+
+  /* precompute 40 epsilon levels */
+  const EPS_MIN = 0.005, EPS_MAX = 0.20, NE = 40;
+  const EPSILONS = Array.from({length: NE}, (_, i) =>
+    EPS_MAX * Math.pow(EPS_MIN / EPS_MAX, i / (NE - 1)));
+  const ALL_STEPS = EPSILONS.map(e => walk(COAST, e));
+  const ALL_LENS  = EPSILONS.map((e, i) => ALL_STEPS[i].length * e);
+
+  /* log-log regression → D_f */
+  const logE = EPSILONS.map(Math.log);
+  const logL = ALL_LENS.map(Math.log);
+  let sX=0, sY=0, sXX=0, sXY=0;
+  for (let i=0; i<NE; i++) { sX+=logE[i]; sY+=logL[i]; sXX+=logE[i]*logE[i]; sXY+=logE[i]*logL[i]; }
+  const slope     = (NE*sXY - sX*sY) / (NE*sXX - sX*sX);
+  const intercept = sY/NE - slope*(sX/NE);
+  const Df        = (1 - slope).toFixed(2);
+
+  /* km calibration */
+  const SCALE_KM = 2800 / ALL_LENS[0];
+
+  /* canvas setup */
+  const cC = document.getElementById('cC');
+  const cP = document.getElementById('cP');
+  const panels = document.querySelector('.panels');
+
+  function resize() {
+    const rh = panels.clientHeight || 330;
+    const rw = panels.clientWidth  || 600;
+    cC.width  = Math.floor(rw * 0.40); cC.height = rh;
+    cP.width  = Math.floor(rw * 0.58); cP.height = rh;
+  }
+  resize();
+
+  /* ---- draw Britain coastline ---- */
+  function drawCoast(idx) {
+    const ctx = cC.getContext('2d');
+    const W = cC.width, H = cC.height;
+    const PAD = 14;
+    const availW = W - 2*PAD, availH = H - 2*PAD;
+    const tx = x => PAD + x * availW;
+    const ty = y => PAD + y * availH;
+
+    ctx.fillStyle = '#dce8f2'; ctx.fillRect(0, 0, W, H);
+
+    /* land */
+    ctx.beginPath();
+    ctx.moveTo(tx(COAST[0][0]), ty(COAST[0][1]));
+    for (let i = 1; i < NC; i++) ctx.lineTo(tx(COAST[i][0]), ty(COAST[i][1]));
+    ctx.closePath();
+    ctx.fillStyle = '#e5dfd5'; ctx.fill();
+    ctx.strokeStyle = '#8a7a6a'; ctx.lineWidth = 0.9; ctx.stroke();
+
+    const eps   = EPSILONS[idx];
+    const steps = ALL_STEPS[idx];
+    const rPx   = (eps / 2) * availW;
+
+    /* ruler circles */
+    if (rPx > 3) {
+      ctx.save(); ctx.globalAlpha = 0.09; ctx.fillStyle = '#dc2626';
+      for (const [x, y] of steps) {
+        ctx.beginPath(); ctx.arc(tx(x), ty(y), rPx, 0, 2*Math.PI); ctx.fill();
+      }
+      ctx.restore();
+    }
+
+    /* measured path */
+    ctx.beginPath();
+    ctx.moveTo(tx(steps[0][0]), ty(steps[0][1]));
+    for (let i = 1; i < steps.length; i++) ctx.lineTo(tx(steps[i][0]), ty(steps[i][1]));
+    ctx.strokeStyle = '#dc2626'; ctx.lineWidth = 2.2; ctx.setLineDash([]); ctx.stroke();
+
+    /* step dots */
+    ctx.fillStyle = '#dc2626';
+    for (const [x, y] of steps) {
+      ctx.beginPath(); ctx.arc(tx(x), ty(y), 2.8, 0, 2*Math.PI); ctx.fill();
+    }
+
+    /* scale bar */
+    const lx1 = tx(0.04), lx2 = tx(0.04) + rPx*2, ly = ty(0.96);
+    if (lx2 > lx1 + 3) {
+      ctx.strokeStyle = '#dc2626'; ctx.lineWidth = 2.2;
+      ctx.beginPath(); ctx.moveTo(lx1, ly); ctx.lineTo(lx2, ly); ctx.stroke();
+      ctx.fillStyle = '#dc2626';
+      ctx.beginPath(); ctx.arc(lx1, ly, 2.8, 0, 2*Math.PI); ctx.fill();
+      ctx.beginPath(); ctx.arc(lx2, ly, 2.8, 0, 2*Math.PI); ctx.fill();
+      ctx.fillStyle = '#dc2626'; ctx.font = '12px JetBrains Mono, monospace';
+      ctx.textAlign = 'left';
+      ctx.fillText('ε = ' + Math.round(eps*SCALE_KM) + ' km', lx2 + 5, ly + 5);
+    }
+
+    /* caption */
+    ctx.fillStyle = '#6b7280'; ctx.font = '12px JetBrains Mono, monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('Gran Bretaña  ·  ' + steps.length + ' pasos', W/2, H - 4);
+  }
+
+  /* ---- draw Richardson plot ---- */
+  function drawPlot(idx) {
+    const ctx = cP.getContext('2d');
+    const W = cP.width, H = cP.height;
+    const LP=62, RP=20, TP=34, BP=42;
+    const IW = W-LP-RP, IH = H-TP-BP;
+
+    ctx.fillStyle = '#fbf9f6'; ctx.fillRect(0, 0, W, H);
+
+    const lxMin = Math.log(EPS_MIN*0.85), lxMax = Math.log(EPS_MAX*1.15);
+    const lyMin = Math.min(...logL) - 0.05, lyMax = Math.max(...logL) + 0.14;
+    const px = lx => LP + (lx-lxMin)/(lxMax-lxMin)*IW;
+    const py = ly => TP + (1-(ly-lyMin)/(lyMax-lyMin))*IH;
+
+    /* grid */
+    ctx.setLineDash([3,3]); ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 0.7;
+    for (let g=0; g<=5; g++) {
+      const lx = lxMin + (lxMax-lxMin)*g/5;
+      ctx.beginPath(); ctx.moveTo(px(lx),TP); ctx.lineTo(px(lx),TP+IH); ctx.stroke();
+      const ly = lyMin + (lyMax-lyMin)*g/5;
+      ctx.beginPath(); ctx.moveTo(LP,py(ly)); ctx.lineTo(LP+IW,py(ly)); ctx.stroke();
+    }
+    ctx.setLineDash([]);
+
+    /* axes */
+    ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(LP,TP); ctx.lineTo(LP,TP+IH); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(LP,TP+IH); ctx.lineTo(LP+IW,TP+IH); ctx.stroke();
+
+    /* axis labels */
+    ctx.fillStyle = '#6b7280'; ctx.font = '13px JetBrains Mono, monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('log ε  (tamaño de regla)', LP + IW/2, H - 5);
+    ctx.save();
+    ctx.translate(14, TP + IH/2); ctx.rotate(-Math.PI/2);
+    ctx.fillText('log L(ε)  (longitud medida)', 0, 0);
+    ctx.restore();
+
+    /* x tick labels */
+    ctx.font = '12px JetBrains Mono, monospace'; ctx.fillStyle = '#94a3b8';
+    [0.007, 0.02, 0.06, 0.15].forEach(e => {
+      const lx = Math.log(e);
+      if (lx > lxMin && lx < lxMax) {
+        ctx.textAlign = 'center';
+        ctx.fillText(Math.round(e*SCALE_KM) + ' km', px(lx), TP+IH+16);
+      }
+    });
+
+    /* regression line */
+    ctx.beginPath();
+    ctx.moveTo(px(lxMin), py(slope*lxMin+intercept));
+    ctx.lineTo(px(lxMax), py(slope*lxMax+intercept));
+    ctx.strokeStyle = '#7c3aed'; ctx.lineWidth = 1.8; ctx.setLineDash([7,4]); ctx.stroke();
+    ctx.setLineDash([]);
+
+    /* slope label rotated */
+    const midLx = lxMin*0.38 + lxMax*0.62;
+    const angRad = Math.atan2(-(slope/(lyMax-lyMin))*IH, IW/(lxMax-lxMin));
+    ctx.save();
+    ctx.translate(px(midLx), py(slope*midLx+intercept) - 12);
+    ctx.rotate(angRad);
+    ctx.font = '12px JetBrains Mono, monospace'; ctx.fillStyle = '#7c3aed';
+    ctx.textAlign = 'center';
+    ctx.fillText('pendiente = 1 − D ≈ ' + slope.toFixed(2), 0, 0);
+    ctx.restore();
+
+    /* dim dots */
+    for (let i=0; i<NE; i++) {
+      if (i === idx) continue;
+      ctx.beginPath(); ctx.arc(px(logE[i]), py(logL[i]), 3.5, 0, 2*Math.PI);
+      ctx.fillStyle = '#cbd5e1'; ctx.fill();
+    }
+
+    /* current dot */
+    ctx.beginPath(); ctx.arc(px(logE[idx]), py(logL[idx]), 7, 0, 2*Math.PI);
+    ctx.fillStyle = '#dc2626'; ctx.fill();
+    ctx.strokeStyle = '#fbf9f6'; ctx.lineWidth = 2; ctx.stroke();
+
+    /* vertical guide */
+    ctx.beginPath();
+    ctx.moveTo(px(logE[idx]), py(logL[idx])+8);
+    ctx.lineTo(px(logE[idx]), TP+IH);
+    ctx.strokeStyle = '#dc262440'; ctx.lineWidth = 1.3; ctx.setLineDash([4,3]); ctx.stroke();
+    ctx.setLineDash([]);
+
+    /* D label */
+    ctx.font = 'bold 17px JetBrains Mono, monospace'; ctx.fillStyle = '#7c3aed';
+    ctx.textAlign = 'right';
+    ctx.fillText('D_f ≈ ' + Df, LP+IW-4, TP+IH-8);
+
+    /* title */
+    ctx.font = 'bold 13px JetBrains Mono, monospace'; ctx.fillStyle = '#444';
+    ctx.textAlign = 'center';
+    ctx.fillText('Gráfica de Richardson', LP+IW/2, TP - 12);
+  }
+
+  /* ---- update display ---- */
+  let curIdx = 0;
+  const sl = document.getElementById('sl');
+
+  function update(idx) {
+    curIdx = idx;
+    sl.value = idx;
+    drawCoast(idx);
+    drawPlot(idx);
+    document.getElementById('vEps').textContent = Math.round(EPSILONS[idx]*SCALE_KM);
+    document.getElementById('vLen').textContent = Math.round(ALL_LENS[idx]*SCALE_KM).toLocaleString('es');
+    document.getElementById('vD').textContent   = 'D_f ≈ ' + Df;
+  }
+
+  /* ---- auto-play: advance one step every 380 ms, loop back to 0 ---- */
+  let paused = false;
+  let pauseTimer = null;
+
+  function tick() {
+    if (!paused) {
+      curIdx = (curIdx + 1) % NE;
+      update(curIdx);
+    }
+  }
+  const autoTimer = setInterval(tick, 380);
+
+  /* manual drag: pause for 4 s then resume */
+  sl.addEventListener('input', e => {
+    paused = true;
+    if (pauseTimer) clearTimeout(pauseTimer);
+    update(+e.target.value);
+    pauseTimer = setTimeout(() => { paused = false; }, 4000);
+  });
+
+  update(0);
+  window.addEventListener('resize', () => { resize(); update(curIdx); });
+})();
+</script>
+</body>
+</html>

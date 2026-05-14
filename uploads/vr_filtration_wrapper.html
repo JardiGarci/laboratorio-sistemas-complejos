@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+    --color-text-secondary: #6b7280;
+    --color-border-tertiary: #d1d5db;
+  }
+  html, body { margin: 0; padding: 0; background: #f5f3f0; }
+  body { padding: 14px 18px 10px 18px; box-sizing: border-box; font-family: var(--font-mono); }
+  .graphs { display: flex; gap: 12px; align-items: flex-start; width: 100%; }
+  .graphs > div:first-child { flex: 0 0 auto; }
+  .graphs > div:last-child  { flex: 1; min-width: 0; }
+  canvas { display: block; border: 0.5px solid var(--color-border-tertiary); border-radius: 6px; }
+  .lbl { font-size: 15px; font-family: var(--font-mono); color: var(--color-text-secondary);
+         margin-bottom: 5px; letter-spacing: 0.04em; }
+  .controls { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
+  .controls span { font-family: var(--font-mono); font-size: 13px; color: var(--color-text-secondary); }
+  .controls input { flex: 1; }
+  .controls .val { font-weight: 500; min-width: 52px; text-align: right; }
+  .stats { display: flex; justify-content: space-around; flex-wrap: wrap;
+           margin-top: 12px; border-top: 0.5px solid var(--color-border-tertiary); padding-top: 10px; }
+  .stat { text-align: center; padding: 2px 16px; }
+  .stat .n { font-size: 26px; font-weight: 500; font-family: var(--font-mono); }
+  .stat .k { font-size: 11px; color: var(--color-text-secondary); font-family: var(--font-mono); }
+</style>
+</head>
+<body>
+<div class="graphs">
+  <div>
+    <div class="lbl">COMPLEJO SIMPLICIAL · ε = <span id="ve">0.220</span></div>
+    <canvas id="vC" width="530" height="430"></canvas>
+  </div>
+  <div>
+    <div class="lbl">BARCODE DE PERSISTENCIA · Dgm(VR)</div>
+    <canvas id="vB" width="700" height="430"></canvas>
+  </div>
+</div>
+<div class="controls">
+  <span>ε</span>
+  <input type="range" id="vSl" min="0" max="0.9" step="0.005" value="0.22">
+  <span class="val" id="vVal">0.220</span>
+</div>
+<div class="stats">
+  <div class="stat"><div class="n" style="color:#378ADD" id="vB0">11</div><div class="k">β₀ componentes</div></div>
+  <div class="stat"><div class="n" style="color:#D4537E" id="vB1">0</div><div class="k">β₁ ciclos</div></div>
+  <div class="stat"><div class="n" style="color:#1D9E75" id="vCh">11</div><div class="k">χ = β₀ − β₁</div></div>
+  <div class="stat"><div class="n" style="color:#888780" id="vAc">0</div><div class="k">barras activas</div></div>
+</div>
+<script>
+(function(){
+const PTS=[[.69,.21],[.87,.34],[.80,.55],[.57,.56],[.52,.34],[.15,.12],[.28,.08],[.19,.25],[.06,.85],[.55,.82],[.70,.87]];
+const NP=PTS.length,d2=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
+const sk=v=>[...v].sort((a,b)=>a-b).join(',');
+function persist(C){
+  const S=[...C].sort((a,b)=>a.f!==b.f?a.f-b.f:a.d-b.d);
+  const m=S.length,ix=new Map(S.map((s,i)=>[sk(s.v),i]));
+  const bnd=s=>{
+    if(s.d===0)return[];
+    if(s.d===1)return s.v.map(x=>ix.get(''+x));
+    return s.d===2?[[s.v[0],s.v[1]],[s.v[0],s.v[2]],[s.v[1],s.v[2]]].map(e=>ix.get(sk(e))):[];
+  };
+  const D=S.map(s=>new Set(bnd(s).filter(x=>x!=null)));
+  const pv=new Map(),lw=j=>D[j].size?Math.max(...D[j]):-1;
+  for(let j=0;j<m;j++){let l=lw(j);while(l!==-1&&pv.has(l)){for(const x of D[pv.get(l)])D[j].has(x)?D[j].delete(x):D[j].add(x);l=lw(j);}if(l!==-1)pv.set(l,j);}
+  const used=new Set(),bars=[];
+  for(let j=0;j<m;j++){const l=lw(j);if(l>=0){used.add(l);used.add(j);if(S[l].f<S[j].f)bars.push({b:S[l].f,d:S[j].f,dim:S[l].d});}}
+  S.forEach((s,i)=>{if(!used.has(i))bars.push({b:s.f,d:Infinity,dim:s.d});});
+  return bars.filter(x=>x.dim<=1);
+}
+function buildVR(){
+  const c=PTS.map((_,i)=>({f:0,d:0,v:[i]}));
+  for(let i=0;i<NP;i++)for(let j=i+1;j<NP;j++)c.push({f:d2(PTS[i],PTS[j]),d:1,v:[i,j]});
+  for(let i=0;i<NP;i++)for(let j=i+1;j<NP;j++)for(let k=j+1;k<NP;k++)c.push({f:Math.max(d2(PTS[i],PTS[j]),d2(PTS[j],PTS[k]),d2(PTS[i],PTS[k])),d:2,v:[i,j,k]});
+  return c;
+}
+function vrAt(e){
+  const E=[],T=[];
+  for(let i=0;i<NP;i++)for(let j=i+1;j<NP;j++)if(d2(PTS[i],PTS[j])<=e)E.push([i,j]);
+  for(let i=0;i<NP;i++)for(let j=i+1;j<NP;j++)for(let k=j+1;k<NP;k++)if(Math.max(d2(PTS[i],PTS[j]),d2(PTS[j],PTS[k]),d2(PTS[i],PTS[k]))<=e)T.push([i,j,k]);
+  return{E,T};
+}
+function vrBetti(e){
+  const{E,T}=vrAt(e),p=Array.from({length:NP},(_,i)=>i);
+  const f=x=>{while(p[x]!==x){p[x]=p[p[x]];x=p[x];}return x;};
+  for(const[i,j]of E){const a=f(i),b=f(j);if(a!==b)p[a]=b;}
+  const b0=new Set(p.map((_,i)=>f(i))).size;
+  return{b0,b1:Math.max(0,b0-NP+E.length-T.length)};
+}
+const BARS=persist(buildVR());
+const BG='#f5f3f0';
+const EGC='#94a3b8';
+const TXT='#94a3b8';
+const GRD='#e2e8f0';
+const PC=['#1d4ed8','#be185d','#15803d','#c2410c','#6d28d9','#0e7490','#a16207','#b91c1c','#047857','#7e22ce','#6b21a8'];
+const LC='#b45309';
+
+function drawVR(cv,e){
+  const ctx=cv.getContext('2d'),W=cv.width,H=cv.height,P=24;
+  // Use a square drawing region so that horizontal and vertical scales are
+  // identical — this ensures circles of radius ε/2 touch exactly when the
+  // Vietoris-Rips edge appears (d(i,j) = ε), with no axis distortion.
+  const Qs=Math.min(W-2*P,H-2*P),Ox=(W-Qs)/2,Oy=(H-Qs)/2;
+  const tx=x=>Ox+x*Qs,ty=y=>Oy+y*Qs;
+  const{E,T}=vrAt(e);
+  const p=Array.from({length:NP},(_,i)=>i);
+  const f=x=>{while(p[x]!==x){p[x]=p[p[x]];x=p[x];}return x;};
+  for(const[i,j]of E){const a=f(i),b=f(j);if(a!==b)p[a]=b;}
+  ctx.clearRect(0,0,W,H);ctx.fillStyle=BG;ctx.fillRect(0,0,W,H);
+  ctx.save();ctx.globalAlpha=0.12;
+  for(const[i,j,k]of T){ctx.beginPath();ctx.moveTo(tx(PTS[i][0]),ty(PTS[i][1]));ctx.lineTo(tx(PTS[j][0]),ty(PTS[j][1]));ctx.lineTo(tx(PTS[k][0]),ty(PTS[k][1]));ctx.closePath();ctx.fillStyle='#7c3aed';ctx.fill();}
+  ctx.restore();
+  const r=Math.min(e/2*Qs,Qs/2);
+  if(r>1)for(let i=0;i<NP;i++){const c=PC[f(i)%PC.length];ctx.beginPath();ctx.arc(tx(PTS[i][0]),ty(PTS[i][1]),r,0,2*Math.PI);ctx.fillStyle=c+'14';ctx.strokeStyle=c+'40';ctx.lineWidth=1;ctx.fill();ctx.stroke();}
+  ctx.lineWidth=1.8;ctx.strokeStyle=EGC;
+  for(const[i,j]of E){ctx.beginPath();ctx.moveTo(tx(PTS[i][0]),ty(PTS[i][1]));ctx.lineTo(tx(PTS[j][0]),ty(PTS[j][1]));ctx.stroke();}
+  for(let i=0;i<NP;i++){const c=PC[f(i)%PC.length];ctx.beginPath();ctx.arc(tx(PTS[i][0]),ty(PTS[i][1]),7,0,2*Math.PI);ctx.fillStyle=c;ctx.fill();ctx.strokeStyle=BG;ctx.lineWidth=2;ctx.stroke();}
+}
+function drawBC(cv,bars,eps){
+  const ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+  const LP=48,RP=28,TP=34,BP=32,IW=W-LP-RP,IH=H-TP-BP;
+  const MX=0.9;
+  ctx.clearRect(0,0,W,H);ctx.fillStyle=BG;ctx.fillRect(0,0,W,H);
+  const toX=v=>LP+Math.min(v/MX,1.05)*IW,INF=LP+IW+8;
+  const h0=bars.filter(b=>b.dim===0).sort((a,b)=>(b.d===Infinity?9e9:b.d-b.b)-(a.d===Infinity?9e9:a.d-a.b));
+  const h1=bars.filter(b=>b.dim===1&&(b.d===Infinity||b.d-b.b>0.08));
+  const H0H=IH*.56,H1H=IH*.36;
+  const g0=Math.min(14,H0H/(h0.length||1)),g1=Math.min(18,H1H/(h1.length||1));
+  ctx.setLineDash([3,3]);ctx.strokeStyle=GRD;ctx.lineWidth=.6;
+  [0,.25,.5,.75,1].forEach(f=>{const x=toX(f*MX);ctx.beginPath();ctx.moveTo(x,TP-6);ctx.lineTo(x,H-BP+4);ctx.stroke();});
+  ctx.setLineDash([]);ctx.strokeStyle=EGC;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(LP,H-BP);ctx.lineTo(W-RP,H-BP);ctx.stroke();
+  ctx.fillStyle=TXT;ctx.font='15px monospace';ctx.textAlign='center';
+  [0,.225,.45,.675,.9].forEach(v=>ctx.fillText(v.toFixed(3),toX(v),H-BP+14));
+  ctx.fillStyle='#378ADD';ctx.font='bold 17px monospace';ctx.textAlign='right';ctx.fillText('H₀',LP-7,TP+9);
+  h0.forEach((b,i)=>{
+    const alive=b.b<=eps&&(b.d===Infinity||eps<b.d),y=TP+6+i*g0;
+    const x1=toX(b.b),x2=b.d===Infinity?INF:toX(b.d);
+    ctx.strokeStyle=alive?'#378ADD':'#60a5fa';ctx.lineWidth=alive?8:5;ctx.lineCap='round';
+    ctx.beginPath();ctx.moveTo(x1,y);ctx.lineTo(x2,y);ctx.stroke();
+    if(b.d===Infinity){ctx.fillStyle=alive?'#378ADD':'#60a5fa';ctx.font='17px monospace';ctx.textAlign='left';ctx.fillText('∞',INF+2,y+4);}
+    else{ctx.fillStyle=alive?'#1e3a8a':'#1d4ed8';ctx.beginPath();ctx.arc(x2,y,alive?5:4,0,2*Math.PI);ctx.fill();}
+  });
+  const sy=TP+H0H+5;
+  ctx.setLineDash([6,4]);ctx.strokeStyle=GRD;ctx.lineWidth=.6;ctx.beginPath();ctx.moveTo(LP-44,sy);ctx.lineTo(W-RP,sy);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle='#D4537E';ctx.font='bold 17px monospace';ctx.textAlign='right';ctx.fillText('H₁',LP-7,sy+15);
+  h1.forEach((b,i)=>{
+    const alive=b.b<=eps&&(b.d===Infinity||eps<b.d),y=sy+14+i*g1;
+    const x1=toX(b.b),x2=b.d===Infinity?INF:toX(b.d);
+    ctx.strokeStyle=alive?'#D4537E':'#f472b6';ctx.lineWidth=alive?9:5;ctx.lineCap='round';
+    ctx.beginPath();ctx.moveTo(x1,y);ctx.lineTo(x2,y);ctx.stroke();
+    if(b.d===Infinity){ctx.fillStyle=alive?'#D4537E':'#f472b6';ctx.font='17px monospace';ctx.textAlign='left';ctx.fillText('∞',INF+2,y+4);}
+    else{ctx.fillStyle=alive?'#831843':'#be185d';ctx.beginPath();ctx.arc(x2,y,alive?6:4,0,2*Math.PI);ctx.fill();}
+  });
+  const px=toX(eps);
+  ctx.strokeStyle=LC;ctx.lineWidth=2;ctx.setLineDash([4,3]);
+  ctx.beginPath();ctx.moveTo(px,TP-14);ctx.lineTo(px,H-BP+8);ctx.stroke();ctx.setLineDash([]);
+  ctx.beginPath();ctx.arc(px,TP-14,4,0,2*Math.PI);ctx.fillStyle=LC;ctx.fill();
+  ctx.fillStyle=LC;ctx.font='15px monospace';ctx.textAlign='center';ctx.fillText('ε='+eps.toFixed(3),px,TP-19);
+}
+let eps=0.22;
+function upd(){
+  drawVR(document.getElementById('vC'),eps);
+  drawBC(document.getElementById('vB'),BARS,eps);
+  const{b0,b1}=vrBetti(eps);
+  const ac=BARS.filter(b=>b.b<=eps&&(b.d===Infinity||eps<b.d)).length;
+  document.getElementById('vB0').textContent=b0;
+  document.getElementById('vB1').textContent=b1;
+  document.getElementById('vCh').textContent=b0-b1;
+  document.getElementById('vAc').textContent=ac;
+  document.getElementById('ve').textContent=eps.toFixed(3);
+  document.getElementById('vVal').textContent=eps.toFixed(3);
+}
+let _vPaused=false,_vPTimer=null;
+document.getElementById('vSl').addEventListener('input',e=>{
+  eps=+e.target.value;upd();
+  _vPaused=true;if(_vPTimer)clearTimeout(_vPTimer);
+  _vPTimer=setTimeout(()=>{_vPaused=false;},4000);
+});
+setInterval(()=>{
+  if(_vPaused)return;
+  eps=Math.round((eps+0.01)/0.005)*0.005;
+  if(eps>0.9+1e-9)eps=0;
+  document.getElementById('vSl').value=eps;
+  upd();
+},280);
+upd();
+})();
+</script>
+</body>
+</html>

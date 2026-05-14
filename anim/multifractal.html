@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  :root {
+    --bg: #f5f3ee;
+    --panel: #ffffff;
+    --ink: #1a1816;
+    --ink-soft: #5b554c;
+    --ink-faint: #9a9388;
+    --line: #d9d3c5;
+    --accent: #134e6f;
+    --rough: #b91c1c;
+    --smooth: #6d28d9;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--ink);
+    font-family: 'JetBrains Mono', ui-monospace, monospace; overflow: hidden; }
+  .wrap { width: 100vw; height: 100vh;
+    padding: 14px 18px;
+    display: grid;
+    grid-template-rows: auto 1fr auto auto;
+    gap: 10px;
+  }
+  .head { display: flex; justify-content: space-between; align-items: baseline;
+    border-bottom: 1px solid var(--line); padding-bottom: 6px; }
+  .title { font-family: 'Fraunces','Newsreader',Georgia,serif; font-size: 18px; font-weight: 600;
+    color: var(--accent); letter-spacing: -0.01em; }
+  .sub { font-size: 12px; color: var(--ink-soft); font-style: italic; }
+  .panels { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; min-height: 0; }
+  .panel { background: var(--panel); border: 1px solid var(--line);
+    border-radius: 8px; padding: 10px 12px; display: flex; flex-direction: column;
+    gap: 8px; min-height: 0; }
+  .ptitle { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--ink-faint); }
+  .imgwrap { flex: 1; position: relative; min-height: 0; }
+  .imgwrap canvas { position: absolute; inset: 0; width: 100%; height: 100%;
+    image-rendering: pixelated; image-rendering: crisp-edges;
+    background: #000; border-radius: 4px; border: 1px solid var(--line); }
+  .imgwrap svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .ctrl { display: grid; grid-template-columns: 140px 1fr 1fr 1fr; gap: 14px;
+    align-items: center; font-size: 12px; }
+  .ctrl label { color: var(--ink-soft); letter-spacing: 0.04em; text-transform: uppercase;
+    font-size: 10px; }
+  .ctrl input[type=range] { width: 100%; accent-color: var(--accent); }
+  .ctrl .v { font-weight: 600; color: var(--accent); margin-left: 6px; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+    border-top: 1px solid var(--line); padding-top: 8px; }
+  .stat { text-align: center; }
+  .stat .n { font-size: 17px; font-weight: 600; color: var(--ink); }
+  .stat .k { font-size: 10px; color: var(--ink-faint); letter-spacing: 0.06em;
+    text-transform: uppercase; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <div>
+      <div class="title">Espectro multifractal · cascada binomial</div>
+      <div class="sub">cómo la asimetría p₀ del proceso multiplicativo controla la textura y el ancho del espectro f(α)</div>
+    </div>
+    <div class="sub mono" id="hint">arrastra el deslizador</div>
+  </div>
+
+  <div class="panels">
+    <div class="panel">
+      <div class="ptitle">imagen — cascada binomial p₀ × (1−p₀)</div>
+      <div class="imgwrap"><canvas id="img"></canvas></div>
+    </div>
+    <div class="panel">
+      <div class="ptitle">espectro f(α) — multifractal</div>
+      <div class="imgwrap"><svg id="spec" viewBox="0 0 600 400" preserveAspectRatio="xMidYMid meet"></svg></div>
+    </div>
+  </div>
+
+  <div class="ctrl">
+    <label>asimetría p₀<span class="v" id="vP">0.50</span></label>
+    <input type="range" id="sl" min="0.50" max="0.95" step="0.01" value="0.70">
+    <div style="font-size:11px;color:var(--ink-faint);">p₀ = 0.5 · monofractal (uniforme)</div>
+    <div style="font-size:11px;color:var(--ink-faint);">p₀ → 1 · multifractal extremo</div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="n" id="sAmin">—</div><div class="k">α mín</div></div>
+    <div class="stat"><div class="n" id="sAmax">—</div><div class="k">α máx</div></div>
+    <div class="stat"><div class="n" id="sW">—</div><div class="k">ancho Δα</div></div>
+    <div class="stat"><div class="n" id="sA0">—</div><div class="k">α₀ (modo)</div></div>
+  </div>
+</div>
+
+<script>
+(function() {
+  // ---------- binomial cascade ----------
+  const DEPTH = 8;                  // image 256×256
+  const N = 1 << DEPTH;             // 256
+
+  function buildCascade(p0) {
+    // measure on dyadic grid
+    let arr = new Float32Array(1); arr[0] = 1;
+    for (let d = 0; d < DEPTH; d++) {
+      const next = new Float32Array(arr.length * 4);
+      // 2D binomial: each cell splits into 2x2 with weights p0,(1-p0),(1-p0),p0
+      // or for asymmetric: corner = p0², two corners = p0(1-p0), one = (1-p0)²
+      const w00 = p0 * p0;
+      const w01 = p0 * (1 - p0);
+      const w10 = (1 - p0) * p0;
+      const w11 = (1 - p0) * (1 - p0);
+      const side = 1 << d;
+      for (let y = 0; y < side; y++) {
+        for (let x = 0; x < side; x++) {
+          const v = arr[y * side + x];
+          const nx = 2*x, ny = 2*y;
+          const nside = side * 2;
+          next[ny     * nside + nx]     = v * w00;
+          next[ny     * nside + nx + 1] = v * w01;
+          next[(ny+1) * nside + nx]     = v * w10;
+          next[(ny+1) * nside + nx + 1] = v * w11;
+        }
+      }
+      arr = next;
+    }
+    return arr;
+  }
+
+  // ---------- compute multifractal spectrum (method of moments) ----------
+  // For a binomial cascade with weights (p0, 1-p0):
+  // Closed-form: τ(q) = -log2(p0^q + (1-p0)^q)
+  // α(q) = dτ/dq = -[p0^q log2(p0) + (1-p0)^q log2(1-p0)] / (p0^q + (1-p0)^q)
+  // f(α) = q α(q) - τ(q)
+  function computeSpectrum(p0) {
+    const pts = [];
+    if (p0 <= 0.5001) {
+      // degenerate: monofractal => single point f(α)=2 at α=2
+      // we'll show a flat singleton-ish curve
+      for (let q = -8; q <= 8; q += 0.25) {
+        pts.push({ q, alpha: 2, f: 2 });
+      }
+      return pts;
+    }
+    const p1 = 1 - p0;
+    const L2 = Math.log2;
+    for (let q = -8; q <= 8; q += 0.2) {
+      const a = Math.pow(p0, q), b = Math.pow(p1, q);
+      const sum = a + b;
+      const tau = -L2(sum);
+      const alpha = -(a * L2(p0) + b * L2(p1)) / sum;
+      // 2D cascade: multiply by 2 (because alpha is per-dimension extension)
+      const f = q * alpha - tau;
+      pts.push({ q, alpha, f });
+    }
+    return pts;
+  }
+
+  // ---------- render image canvas ----------
+  const imgC = document.getElementById('img');
+  const ictx = imgC.getContext('2d', { alpha: false });
+
+  function fit() {
+    const r = imgC.parentElement.getBoundingClientRect();
+    // square viewport — use min side
+    const side = Math.min(r.width, r.height);
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    imgC.style.width = side + 'px';
+    imgC.style.height = side + 'px';
+    imgC.style.left = ((r.width - side) / 2) + 'px';
+    imgC.style.top = ((r.height - side) / 2) + 'px';
+    imgC.style.position = 'absolute';
+    imgC.width = imgC.height = N;   // logical size = cascade size
+  }
+
+  function drawImage(p0) {
+    const arr = buildCascade(p0);
+    // find max for normalization
+    let mx = 0;
+    for (let i = 0; i < arr.length; i++) if (arr[i] > mx) mx = arr[i];
+    const img = ictx.createImageData(N, N);
+    const d = img.data;
+    for (let i = 0; i < arr.length; i++) {
+      // use log normalization so we can see broad range
+      const v = arr[i] / mx;
+      const t = Math.pow(v, 0.18);     // gamma compress
+      // teal → cyan → cream colormap
+      let r, g, b;
+      if (t < 0.45) {
+        const u = t / 0.45;
+        r = 10 + u * 20; g = 20 + u * 80; b = 40 + u * 130;
+      } else if (t < 0.78) {
+        const u = (t - 0.45) / 0.33;
+        r = 30 + u * 90; g = 100 + u * 130; b = 170 + u * 60;
+      } else {
+        const u = (t - 0.78) / 0.22;
+        r = 120 + u * 130; g = 230 + u * 25; b = 230 + u * 25;
+      }
+      const idx = i * 4;
+      d[idx] = r; d[idx+1] = g; d[idx+2] = b; d[idx+3] = 255;
+    }
+    ictx.putImageData(img, 0, 0);
+  }
+
+  // ---------- spectrum SVG ----------
+  const specSvg = document.getElementById('spec');
+  function drawSpec(p0) {
+    const pts = computeSpectrum(p0);
+    // bounds
+    const alphas = pts.map(p => p.alpha);
+    const fs     = pts.map(p => p.f);
+    const aMin = Math.min(...alphas, 0), aMax = Math.max(...alphas, 2);
+    const fMin = Math.min(0, Math.min(...fs)), fMax = Math.max(1.4, Math.max(...fs));
+
+    // pad ranges
+    const padA = (aMax - aMin) * 0.15 + 0.2;
+    const padF = (fMax - fMin) * 0.18 + 0.1;
+    const a0 = aMin - padA, a1 = aMax + padA;
+    const f0 = fMin - padF, f1 = fMax + padF;
+
+    const W = 600, H = 400, L = 60, R = 18, T = 18, B = 46;
+    const IW = W - L - R, IH = H - T - B;
+    const xs = a => L + (a - a0) / (a1 - a0) * IW;
+    const ys = f => T + (1 - (f - f0) / (f1 - f0)) * IH;
+
+    // build elements
+    let s = '';
+    // background grid
+    s += `<rect x="0" y="0" width="${W}" height="${H}" fill="#fbf8f1"/>`;
+    s += `<g stroke="#e6e1d4" stroke-width="0.8" stroke-dasharray="3 4">`;
+    for (let i = 0; i <= 5; i++) {
+      const x = L + IW * i/5, y = T + IH * i/5;
+      s += `<line x1="${x}" y1="${T}" x2="${x}" y2="${T+IH}"/>`;
+      s += `<line x1="${L}" y1="${y}" x2="${L+IW}" y2="${y}"/>`;
+    }
+    s += `</g>`;
+    // axes
+    s += `<line x1="${L}" y1="${T+IH}" x2="${L+IW}" y2="${T+IH}" stroke="#5b554c"/>`;
+    s += `<line x1="${L}" y1="${T}" x2="${L}" y2="${T+IH}" stroke="#5b554c"/>`;
+    // axis ticks
+    s += `<g font-family="'JetBrains Mono',monospace" font-size="11" fill="#7a7466">`;
+    for (let i = 0; i <= 4; i++) {
+      const at = a0 + (a1 - a0) * i/4;
+      s += `<text x="${xs(at)}" y="${T+IH+18}" text-anchor="middle">${at.toFixed(2)}</text>`;
+    }
+    for (let i = 0; i <= 4; i++) {
+      const ft = f0 + (f1 - f0) * i/4;
+      s += `<text x="${L-6}" y="${ys(ft)+4}" text-anchor="end">${ft.toFixed(2)}</text>`;
+    }
+    s += `</g>`;
+    // axis titles
+    s += `<text x="${L+IW/2}" y="${H-10}" text-anchor="middle" font-family="Fraunces,serif" font-style="italic" font-size="14" fill="#1a1816">α — exponente de Hölder</text>`;
+    s += `<text x="${18}" y="${T+IH/2}" transform="rotate(-90 18 ${T+IH/2})" text-anchor="middle" font-family="Fraunces,serif" font-style="italic" font-size="14" fill="#1a1816">f(α) — dim. de soporte</text>`;
+
+    // spectrum curve
+    let path = '';
+    for (let i = 0; i < pts.length; i++) {
+      const x = xs(pts[i].alpha), y = ys(pts[i].f);
+      path += (i === 0 ? 'M' : 'L') + x.toFixed(1) + ',' + y.toFixed(1);
+    }
+    s += `<path d="${path}" fill="none" stroke="#134e6f" stroke-width="2.2" stroke-linejoin="round"/>`;
+    // dots at q=0, q=±1, q=±5
+    pts.forEach(p => {
+      if (Math.abs(p.q) < 0.01 || Math.abs(p.q - 1) < 0.11 || Math.abs(p.q + 1) < 0.11) {
+        const isMode = Math.abs(p.q) < 0.01;
+        const fill = isMode ? '#b91c1c' : '#134e6f';
+        const r = isMode ? 5 : 3.5;
+        s += `<circle cx="${xs(p.alpha)}" cy="${ys(p.f)}" r="${r}" fill="${fill}" stroke="#fff" stroke-width="1.5"/>`;
+        if (isMode) {
+          s += `<text x="${xs(p.alpha)+8}" y="${ys(p.f)-8}" font-family="Fraunces,serif" font-style="italic" font-size="12" fill="#b91c1c">q=0 · α₀</text>`;
+        }
+      }
+    });
+    // monofractal reference: vertical mark at α=2
+    s += `<line x1="${xs(2)}" y1="${T}" x2="${xs(2)}" y2="${T+IH}" stroke="#9a9388" stroke-dasharray="2 3" stroke-width="1"/>`;
+    s += `<text x="${xs(2)+4}" y="${T+12}" font-family="JetBrains Mono,monospace" font-size="10" fill="#9a9388">α=2 (monofractal)</text>`;
+
+    specSvg.innerHTML = s;
+
+    // stats
+    const aLo = Math.min(...alphas), aHi = Math.max(...alphas);
+    const center = pts.find(p => Math.abs(p.q) < 0.01) || pts[Math.floor(pts.length/2)];
+    document.getElementById('sAmin').textContent = aLo.toFixed(3);
+    document.getElementById('sAmax').textContent = aHi.toFixed(3);
+    document.getElementById('sW').textContent = (aHi - aLo).toFixed(3);
+    document.getElementById('sA0').textContent = center.alpha.toFixed(3);
+  }
+
+  // ---------- wiring ----------
+  const sl = document.getElementById('sl');
+  const vP = document.getElementById('vP');
+  let p0 = parseFloat(sl.value);
+  let raf = null;
+
+  function update() {
+    vP.textContent = p0.toFixed(2);
+    drawImage(p0);
+    drawSpec(p0);
+  }
+
+  function resize() {
+    fit();
+    update();
+  }
+
+  sl.addEventListener('input', e => {
+    p0 = parseFloat(e.target.value);
+    if (raf) cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(update);
+  });
+
+  window.addEventListener('resize', resize);
+  resize();
+
+  // gentle auto-play on load
+  let auto = true;
+  let dir = 1;
+  const tick = () => {
+    if (!auto) return;
+    p0 += dir * 0.003;
+    if (p0 >= 0.92) { p0 = 0.92; dir = -1; }
+    if (p0 <= 0.52) { p0 = 0.52; dir = 1; }
+    sl.value = p0;
+    update();
+  };
+  let timer = setInterval(tick, 90);
+  // stop auto after 22s, or on first interaction
+  setTimeout(() => { auto = false; }, 22000);
+  sl.addEventListener('input', () => { auto = false; });
+})();
+</script>
+</body>
+</html>

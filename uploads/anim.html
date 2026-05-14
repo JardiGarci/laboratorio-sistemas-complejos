@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Animación · Espectro multifractal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f5f3ee;
+      --panel: #ffffff;
+      --ink: #1a1816;
+      --ink-soft: #5b554c;
+      --ink-faint: #9a9388;
+      --line: #d9d3c5;
+      --accent: #134e6f;
+      --rough: #b91c1c;
+      --smooth: #6d28d9;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: var(--bg); color: var(--ink);
+      font-family: 'Inter', system-ui, sans-serif; }
+    .anim { width: 100vw; height: 100vh; padding: 16px 20px;
+      display: flex; flex-direction: column; gap: 14px; }
+    .anim-head { display: flex; justify-content: space-between; align-items: baseline;
+      border-bottom: 1px solid var(--line); padding-bottom: 8px; }
+    .anim-title { font-family: 'Fraunces', Georgia, serif; font-size: 22px; font-weight: 600;
+      color: var(--accent); letter-spacing: -0.01em; }
+    .anim-label { font-size: 13px; color: var(--ink-soft); font-style: italic;
+      font-family: 'Fraunces', Georgia, serif; }
+    .anim-grid { flex: 1 1 auto; display: grid; grid-template-columns: minmax(0, auto) minmax(0, 1fr); gap: 14px;
+      min-height: 0; }
+    .anim-panel { background: var(--panel); border: 1px solid var(--line);
+      border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px;
+      min-width: 0; min-height: 0; overflow: hidden; }
+    .anim-panel.image-side { width: auto; }
+    .anim-panel.graph-side { min-width: 0; }
+    .panel-head { display: flex; justify-content: space-between; align-items: baseline; }
+    .panel-head h3 { margin: 0; font-family: 'Fraunces', serif; font-size: 14px; font-weight: 600; }
+    .meta { font-size: 10px; letter-spacing: 0.05em; text-transform: uppercase;
+      color: var(--ink-faint); }
+    .anim-image { flex: 1 1 auto; min-height: 0; aspect-ratio: 1/1;
+      background: #000; border-radius: 6px; overflow: hidden; border: 1px solid var(--line);
+      height: 100%; width: auto; max-width: 100%; }
+    .anim-image canvas { width: 100%; height: 100%; display: block;
+      image-rendering: pixelated; image-rendering: crisp-edges; }
+    .anim-svg { width: 100%; height: 100%; display: block; }
+    .grid-line { stroke: #ebe6da; stroke-width: 1; }
+    .axis { stroke: #5b554c; stroke-width: 1.2; }
+    .tick-text { font-size: 11px; fill: var(--ink-soft);
+      font-family: 'JetBrains Mono', monospace; }
+    .tick-text.faint { fill: var(--ink-faint); font-size: 10px; }
+    .named-tick { font-size: 13px; fill: var(--ink); font-family: 'Fraunces', serif;
+      font-style: italic; }
+    .ax-title { font-size: 14px; fill: var(--ink); font-family: 'Fraunces', serif;
+      font-style: italic; }
+    .spec-pt { fill: none; stroke: #2c5e8a; stroke-width: 1.4; }
+    .spec-start { fill: var(--rough); stroke: #fff; stroke-width: 1.5; }
+    .start-label { font-size: 13px; fill: var(--rough); font-weight: 600;
+      font-family: 'Fraunces', serif; }
+    .bracket-label { font-size: 12px; font-weight: 600; }
+    .anim-foot { border-top: 1px solid var(--line); padding-top: 8px; }
+    .legend-row { display: flex; justify-content: space-around; font-size: 12px;
+      color: var(--ink-soft); font-family: 'JetBrains Mono', monospace; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <script type="text/babel" src="spectrum.jsx"></script>
+  <script type="text/babel" src="cascade.jsx"></script>
+  <script type="text/babel" src="anim.jsx"></script>
+</body>
+</html>
