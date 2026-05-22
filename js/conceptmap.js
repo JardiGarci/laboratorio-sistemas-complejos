@@ -18,43 +18,43 @@
 
     // BRANCH 1 — Fractal
     { id: 'b-fractal', label: 'Análisis Fractal', kind: 'branch', status: 'active',
-      href: '#rama-fractal', branch: 1,
-      desc: 'Geometría de lo rugoso, autosemejanza, dimensiones no enteras.', cta: 'ir a la rama →' },
-    { id: 'f-intro',  label: '¿Qué es un fractal?',     kind: 'leaf', status: 'active', href: '#fractales',     branch: 1,
+      href: 'fractal.html', branch: 1,
+      desc: 'Geometría de lo rugoso, autosemejanza, dimensiones no enteras.', cta: 'abrir página →' },
+    { id: 'f-intro',  label: '¿Qué es un fractal?',     kind: 'leaf', status: 'active', href: 'fractal.html#fractales',     branch: 1,
       desc: 'Definición intuitiva, autosemejanza, paradoja de la costa.' },
-    { id: 'f-dim',    label: 'Dimensión fractal',        kind: 'leaf', status: 'active', href: '#dimension',     branch: 1,
+    { id: 'f-dim',    label: 'Dimensión fractal',        kind: 'leaf', status: 'active', href: 'fractal.html#dimension',     branch: 1,
       desc: 'Cómo medir la rugosidad: Hausdorff y box-counting.' },
-    { id: 'f-gal',    label: 'Fractales sintéticos',     kind: 'leaf', status: 'active', href: '#galeria',       branch: 1,
+    { id: 'f-gal',    label: 'Fractales sintéticos',     kind: 'leaf', status: 'active', href: 'fractal.html#galeria',       branch: 1,
       desc: 'Mandelbrot, Julia, Koch, Sierpiński, Barnsley, Cantor.' },
-    { id: 'f-nat',    label: 'Fractales en la naturaleza', kind: 'leaf', status: 'active', href: '#naturaleza',  branch: 1,
+    { id: 'f-nat',    label: 'Fractales en la naturaleza', kind: 'leaf', status: 'active', href: 'fractal.html#naturaleza',  branch: 1,
       desc: 'Costas, pulmones, árboles, sismos, mercados.' },
-    { id: 'f-mf',     label: 'Análisis multifractal',    kind: 'leaf', status: 'active', href: '#multifractal',  branch: 1,
+    { id: 'f-mf',     label: 'Análisis multifractal',    kind: 'leaf', status: 'active', href: 'fractal.html#multifractal',  branch: 1,
       desc: 'Espectro f(α): cuando una sola dimensión no basta.' },
 
     // BRANCH 2 — Topológico
     { id: 'b-tda', label: 'Análisis Topológico', kind: 'branch', status: 'active',
-      href: '#rama-tda', branch: 2,
-      desc: 'La forma de los datos: invariantes que sobreviven a la deformación continua.', cta: 'ir a la rama →' },
-    { id: 't-simp',  label: 'Complejos simpliciales', kind: 'leaf', status: 'active', href: '#tda-simplex',     branch: 2,
+      href: 'topologia.html', branch: 2,
+      desc: 'La forma de los datos: invariantes que sobreviven a la deformación continua.', cta: 'abrir página →' },
+    { id: 't-simp',  label: 'Complejos simpliciales', kind: 'leaf', status: 'active', href: 'topologia.html#tda-simplex',     branch: 2,
       desc: 'Puntos, aristas, triángulos: la unidad básica de TDA.' },
-    { id: 't-filt',  label: 'Filtración Vietoris–Rips', kind: 'leaf', status: 'active', href: '#tda-filtration', branch: 2,
+    { id: 't-filt',  label: 'Filtración Vietoris–Rips', kind: 'leaf', status: 'active', href: 'topologia.html#tda-filtration', branch: 2,
       desc: 'Secuencia anidada de complejos según ε.' },
-    { id: 't-hom',   label: 'Grupos de homología',     kind: 'leaf', status: 'active', href: '#tda-homology',   branch: 2,
+    { id: 't-hom',   label: 'Grupos de homología',     kind: 'leaf', status: 'active', href: 'topologia.html#tda-homology',   branch: 2,
       desc: 'Números de Betti: contar componentes, lazos y cavidades.' },
-    { id: 't-pers',  label: 'Persistencia',            kind: 'leaf', status: 'active', href: '#tda',             branch: 2,
+    { id: 't-pers',  label: 'Persistencia',            kind: 'leaf', status: 'active', href: 'topologia.html#tda-persistence',             branch: 2,
       desc: 'Qué rasgos sobreviven a escalas crecientes: el barcode.' },
 
     // BRANCH 3 — Redes
     { id: 'b-net', label: 'Redes Complejas', kind: 'branch', status: 'active',
-      href: '#rama-redes', branch: 3,
-      desc: 'La arquitectura de las interacciones: nodos, aristas, emergencia.', cta: 'ir a la rama →' },
-    { id: 'n-types',  label: 'Tipos de redes',     kind: 'leaf', status: 'active', href: '#redes-tipos',    branch: 3,
+      href: 'redes.html', branch: 3,
+      desc: 'La arquitectura de las interacciones: nodos, aristas, emergencia.', cta: 'abrir página →' },
+    { id: 'n-types',  label: 'Tipos de redes',     kind: 'leaf', status: 'active', href: 'redes.html#redes-tipos',    branch: 3,
       desc: 'Regulares, aleatorias, mundo pequeño, libres de escala.' },
-    { id: 'n-metric', label: 'Métricas',           kind: 'leaf', status: 'active', href: '#redes-metricas', branch: 3,
+    { id: 'n-metric', label: 'Métricas',           kind: 'leaf', status: 'active', href: 'redes.html#redes-metricas', branch: 3,
       desc: 'Grado, intermediación, cercanía, eigenvector, clustering.' },
-    { id: 'n-small',  label: 'Mundo pequeño',      kind: 'leaf', status: 'active', href: '#redes-mundo',    branch: 3,
+    { id: 'n-small',  label: 'Mundo pequeño',      kind: 'leaf', status: 'active', href: 'redes.html#redes-mundo',    branch: 3,
       desc: 'Modelo Watts–Strogatz, interactivo.' },
-    { id: 'n-cases',  label: 'Casos · usos reales', kind: 'leaf', status: 'active', href: '#redes-casos',   branch: 3,
+    { id: 'n-cases',  label: 'Casos · usos reales', kind: 'leaf', status: 'active', href: 'redes.html#redes-casos',   branch: 3,
       desc: 'PageRank, epidemias, conectoma, fraude, recomendación.' },
   ];
 
@@ -122,8 +122,8 @@
     const cx = w / 2, cy = h / 2;
     // landscape map: branches/leaves spread more horizontally
     const R = Math.min(w * 0.42, h * 0.46);
-    const Rbranch = R * 0.50;
-    const Rleaf   = R * 1.0;
+    const Rbranch = R * 0.62;   // push branches further from core
+    const Rleaf   = R * 1.05;
 
     nodes.forEach(n => {
       if (n.id === 'core') {
@@ -171,8 +171,9 @@
   // which time the script body has finished and those are defined.
   function tickFn() {
     if (!gNode) return;
+    // clamp to bounds
     nodes.forEach(n => {
-      const r = n.kind === 'core' ? 60 : n.kind === 'branch' ? 50 : 30;
+      const r = n.kind === 'core' ? 72 : n.kind === 'branch' ? 50 : 30;
       n.x = Math.max(r, Math.min(w - r, n.x));
       n.y = Math.max(r, Math.min(h - r, n.y));
     });
@@ -216,7 +217,7 @@
   // halo (animated for core, static for others)
   gNode.append('circle')
     .attr('class', 'halo')
-    .attr('r', d => d.kind === 'core' ? 56 : d.kind === 'branch' ? 36 : 22)
+    .attr('r', d => d.kind === 'core' ? 70 : d.kind === 'branch' ? 36 : 22)
     .attr('fill', d => {
       if (d.kind === 'core') return 'rgba(124,58,237,0.15)';
       if (d.kind === 'branch') return (BRANCH_COLORS[d.branch] || {}).tint || 'rgba(255,255,255,0.05)';
@@ -226,7 +227,7 @@
   // core gets a second pulsing halo
   gNode.filter(d => d.kind === 'core').append('circle')
     .attr('class', 'pulse')
-    .attr('r', 56)
+    .attr('r', 70)
     .attr('fill', 'none')
     .attr('stroke', '#7c3aed')
     .attr('stroke-width', 1.5)
@@ -235,7 +236,7 @@
   // main circle
   gNode.append('circle')
     .attr('class', 'core')
-    .attr('r', d => d.kind === 'core' ? 36 : d.kind === 'branch' ? 22 : 11)
+    .attr('r', d => d.kind === 'core' ? 48 : d.kind === 'branch' ? 22 : 11)
     .attr('fill', d => {
       if (d.kind === 'core') return 'url(#coreGrad)';
       if (d.kind === 'branch') {
@@ -263,19 +264,25 @@
       .attr('font-size', d.kind === 'core' ? 16 : d.kind === 'branch' ? 14 : 12)
       .attr('fill', d.kind === 'core' ? '#fff' : d.kind === 'branch' ? '#fff' : 'rgba(244,238,223,0.95)');
 
-    // core: white text inside; offset y
+    // core: white text inside the circle — two stacked lines, sized to fit
     if (d.kind === 'core') {
-      text.attr('y', 4);
-      // two lines: "Sistemas" / "Complejos"
-      text.append('tspan').attr('x', 0).attr('dy', -8).text('Sistemas');
-      text.append('tspan').attr('x', 0).attr('dy', 18).text('Complejos');
+      text.attr('y', 0).attr('font-size', 13).attr('font-weight', 600);
+      text.append('tspan').attr('x', 0).attr('dy', '-0.3em').text('Sistemas');
+      text.append('tspan').attr('x', 0).attr('dy', '1.2em').text('Complejos');
     } else if (d.kind === 'branch') {
-      // place label below the node circle
-      text.attr('y', 42);
-      // split into max 2 lines on space
+      // Place label on the side AWAY from the core circle so it never
+      // overlaps with the central "Sistemas Complejos" node.
+      const angle = branchAngles[d.id] != null ? branchAngles[d.id] : Math.PI / 2;
+      const isAbove = Math.sin(angle) < 0;
+      const yOff = isAbove ? -32 : 42;
+      text.attr('y', yOff);
       const parts = d.label.split(' ');
       if (parts.length === 1) {
         text.text(d.label);
+      } else if (isAbove) {
+        // labels above: stack upward — second line first, first line on top
+        text.append('tspan').attr('x', 0).attr('dy', '-1em').text(parts[0]);
+        text.append('tspan').attr('x', 0).attr('dy', '1em').text(parts.slice(1).join(' '));
       } else {
         text.append('tspan').attr('x', 0).text(parts[0]);
         text.append('tspan').attr('x', 0).attr('dy', 17).text(parts.slice(1).join(' '));
@@ -322,18 +329,14 @@
     .on('click', (ev, d) => {
       hideTooltip();
       if (d.action === 'modal') {
-        // open modal
         const modal = document.getElementById('modalSC');
         if (modal) { modal.classList.add('is-open'); modal.setAttribute('aria-hidden', 'false'); }
         return;
       }
       if (d.href) {
-        const target = document.querySelector(d.href);
-        if (target) {
-          const navH = 60;
-          const y = target.getBoundingClientRect().top + window.scrollY - navH;
-          window.scrollTo({ top: y, behavior: 'smooth' });
-        }
+        // Navigate to a different page (external URL with optional #anchor)
+        // — no smooth-scroll; just go.
+        window.location.href = d.href;
       }
     });
 
@@ -341,7 +344,7 @@
   gNode.on('mouseover.lift', function(ev, d){
     d3.select(this).select('.halo')
       .transition().duration(180)
-      .attr('r', d.kind === 'core' ? 70 : d.kind === 'branch' ? 46 : 28);
+      .attr('r', d.kind === 'core' ? 86 : d.kind === 'branch' ? 46 : 28);
     d3.select(this).select('.core')
       .transition().duration(180)
       .attr('stroke-width', d.kind === 'core' ? 3.5 : 3);
@@ -349,7 +352,7 @@
   gNode.on('mouseout.lift', function(ev, d){
     d3.select(this).select('.halo')
       .transition().duration(220)
-      .attr('r', d.kind === 'core' ? 56 : d.kind === 'branch' ? 36 : 22);
+      .attr('r', d.kind === 'core' ? 70 : d.kind === 'branch' ? 36 : 22);
     d3.select(this).select('.core')
       .transition().duration(220)
       .attr('stroke-width', d.kind === 'core' ? 2.5 : d.kind === 'branch' ? 2 : 2);
@@ -384,9 +387,9 @@
   function pulse() {
     svg.select('.pulse')
       .transition().duration(1800).ease(d3.easeCubicOut)
-      .attr('r', 90).attr('opacity', 0)
+      .attr('r', 110).attr('opacity', 0)
       .on('end', function() {
-        d3.select(this).attr('r', 56).attr('opacity', 0.6);
+        d3.select(this).attr('r', 70).attr('opacity', 0.6);
         pulse();
       });
   }

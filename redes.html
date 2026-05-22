@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Redes Complejas · Laboratorio de Sistemas Complejos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="nav" id="nav">
+  <div class="nav__inner">
+    <a class="nav__brand" href="index.html">
+      <span class="nav__logo" aria-hidden="true"></span>
+      <span class="nav__brand-text">Lab. Sistemas Complejos</span>
+    </a>
+    <ul class="nav__links">
+      <li><a href="index.html">Mapa</a></li>
+      <li><a href="fractal.html">Análisis fractal</a></li>
+      <li><a href="topologia.html">Análisis topológico</a></li>
+      <li><a class="is-current" href="redes.html">Redes complejas</a></li>
+    </ul>
+    <div class="nav__progress" id="navProgress"></div>
+  </div>
+</nav>
+
+<header class="branch-hero branch-hero--net">
+  <div class="branch-hero__inner">
+    <p class="branch-hero__crumb mono">
+      <a href="index.html">← mapa conceptual</a> · rama III
+    </p>
+    <h1 class="branch-hero__title">Redes <em>Complejas</em></h1>
+    <p class="branch-hero__sub">
+      La arquitectura de las interacciones. Quién está conectado con
+      quién, y qué emerge de ese tejido.
+    </p>
+    <ul class="branch-hero__toc">
+      <li><a href="#redes-intro"><span class="mono">01</span> ¿Por qué redes?</a></li>
+      <li><a href="#redes-tipos"><span class="mono">02</span> Tipos de redes</a></li>
+      <li><a href="#redes-metricas"><span class="mono">03</span> Métricas · centralidad</a></li>
+      <li><a href="#redes-mundo"><span class="mono">04</span> Mundo pequeño · interactivo</a></li>
+      <li><a href="#redes-casos"><span class="mono">05</span> Casos · usos reales</a></li>
+    </ul>
+  </div>
+</header>
+
+<main>
+
+<section class="section section--net" id="redes-intro">
+  <div class="section__head">
+    <span class="section__index mono">§ 01</span>
+    <span class="section__kicker mono">Motivación</span>
+  </div>
+
+  <h2 class="section__title">¿Por qué usar redes?</h2>
+
+  <div class="prose">
+    <p class="prose__lede">
+      Una red — o grafo — es la abstracción más sencilla de una
+      arquitectura de interacciones: <strong>nodos</strong> y
+      <strong>aristas</strong>. Bajo esa simpleza se esconde un lenguaje
+      potentísimo para describir desde el cerebro hasta internet.
+    </p>
+
+    <p>
+      El comportamiento de un sistema complejo no se sigue solo de las
+      propiedades de sus partes — depende crucialmente de la
+      <em>topología</em> de quién interactúa con quién. Dos sociedades
+      con el mismo número de personas pueden ser radicalmente distintas
+      según cómo estén conectadas. Dos cerebros con las mismas neuronas
+      son cerebros distintos si su cableado difiere.
+    </p>
+
+    <div class="why-grid why-grid--3">
+      <div class="why">
+        <p class="mono mono--dim">qué información dan</p>
+        <p>
+          Identifican <strong>nodos clave</strong> (influencers, hubs,
+          cuellos de botella), <strong>comunidades</strong> ocultas, rutas
+          eficientes, vulnerabilidades, y patrones de propagación de
+          información, enfermedades o cascadas.
+        </p>
+      </div>
+      <div class="why">
+        <p class="mono mono--dim">para qué nos han servido</p>
+        <p>
+          Diseño de internet resiliente; <strong>PageRank</strong> de
+          Google; predicción de epidemias (SARS-CoV-2); mapeo del
+          conectoma cerebral; detección de fraude bancario; recomendación
+          en redes sociales; análisis de cadenas de suministro globales.
+        </p>
+      </div>
+      <div class="why">
+        <p class="mono mono--dim">qué propiedades emergen</p>
+        <p>
+          <strong>Mundo pequeño</strong> (todos conectados por seis pasos),
+          <strong>libre de escala</strong> (pocos hubs, muchos nodos
+          periféricos), <strong>robustez por redundancia</strong>,
+          <strong>cascadas</strong> de fallos, sincronización colectiva.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section--net" id="redes-tipos">
+  <div class="section__head">
+    <span class="section__index mono">§ 02</span>
+    <span class="section__kicker mono">Taxonomía</span>
+  </div>
+
+  <h2 class="section__title">Tipos de redes</h2>
+
+  <p class="prose__lede prose__lede--centered">
+    Cuatro modelos canónicos que sirven como vocabulario para clasificar
+    casi cualquier red real.
+  </p>
+
+  <div class="net-types" id="netTypes"></div>
+</section>
+
+<section class="section section--net" id="redes-metricas">
+  <div class="section__head">
+    <span class="section__index mono">§ 03</span>
+    <span class="section__kicker mono">Centralidad</span>
+  </div>
+
+  <h2 class="section__title">¿Qué es importante en una red?</h2>
+
+  <p class="prose">
+    No todos los nodos son iguales. Pero "importante" significa cosas
+    distintas según para qué. Hay varias <strong>centralidades</strong>
+    — cada una mide una forma distinta de protagonismo.
+  </p>
+
+  <div class="metrics" id="metrics"></div>
+
+  <details class="formal">
+    <summary class="formal__summary">
+      <span class="formal__chev" aria-hidden="true"></span>
+      <span>Para licenciatura — métricas globales (L, C, modularidad, asortividad)</span>
+    </summary>
+    <div class="formal__body">
+      <p>
+        Sea <span class="mono">G = (V, E)</span> un grafo con
+        <span class="mono">n = |V|</span> nodos.
+      </p>
+      <p>
+        <strong>Distancia media</strong>
+        <span class="mono">⟨L⟩ = (1/n(n−1)) Σ<sub>i≠j</sub> d(i,j)</span> —
+        longitud típica del camino más corto.
+      </p>
+      <p>
+        <strong>Coeficiente de clustering local</strong> del nodo
+        <span class="mono">i</span> con <span class="mono">k<sub>i</sub></span>
+        vecinos y <span class="mono">e<sub>i</sub></span> aristas entre
+        ellos:
+      </p>
+      <p class="formal__eq mono">
+        C<sub>i</sub> = 2 e<sub>i</sub> / (k<sub>i</sub> (k<sub>i</sub> − 1))
+      </p>
+      <p>
+        El clustering global <span class="mono">C = ⟨C<sub>i</sub>⟩</span>.
+      </p>
+      <p>
+        <strong>Distribución de grado</strong>
+        <span class="mono">P(k)</span>. En redes libres de escala
+        <span class="mono">P(k) ~ k<sup>−γ</sup></span> con
+        <span class="mono">γ ∈ [2, 3]</span> (Barabási–Albert).
+      </p>
+      <p>
+        <strong>Modularidad</strong>
+        <span class="mono">Q</span> (Newman) mide cuánto mejor está
+        dividida la red en comunidades respecto a un modelo nulo.
+      </p>
+      <p class="formal__ref mono mono--dim">
+        ref. Newman — <em>Networks</em>, Oxford (2018). Barabási —
+        <em>Network Science</em>, Cambridge (2016).
+      </p>
+    </div>
+  </details>
+</section>
+
+<section class="section section--net" id="redes-mundo">
+  <div class="section__head">
+    <span class="section__index mono">§ 04</span>
+    <span class="section__kicker mono">Interactivo</span>
+  </div>
+
+  <h2 class="section__title">Mundo pequeño · Watts–Strogatz</h2>
+
+  <p class="prose__lede">
+    En 1998, Watts y Strogatz mostraron algo asombroso: si tomas una red
+    <em>regular</em> (muy estructurada, vecinos solo de vecinos) y
+    reconectas algunas pocas aristas <em>al azar</em>, la longitud media
+    del camino <em>se desploma</em> — sin perder la alta densidad de
+    triángulos local.
+  </p>
+
+  <p class="prose">
+    Mueve el deslizador para reconectar cada arista con probabilidad
+    <span class="mono">p</span>. Observa qué pasa con la longitud media
+    <span class="mono">L</span> y el clustering <span class="mono">C</span>
+    — normalizados por sus valores en la red regular.
+  </p>
+
+  <div class="ws">
+    <div class="ws__head">
+      <div>
+        <p class="ws__title">Modelo Watts–Strogatz</p>
+        <p class="ws__sub mono mono--dim">n = 32 nodos · k = 4 vecinos por lado</p>
+      </div>
+      <div class="ws__readout">
+        <div class="ws__stat">
+          <span class="mono mono--dim">p</span>
+          <span class="mono mono--big" id="wsP">0.00</span>
+        </div>
+        <div class="ws__stat">
+          <span class="mono mono--dim">L / L₀</span>
+          <span class="mono mono--big" style="color: var(--cyan)" id="wsL">1.000</span>
+        </div>
+        <div class="ws__stat">
+          <span class="mono mono--dim">C / C₀</span>
+          <span class="mono mono--big" style="color: var(--orange)" id="wsC">1.000</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="ws__panels">
+      <div class="ws__panel ws__panel--net">
+        <svg id="wsNet" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid meet"></svg>
+      </div>
+      <div class="ws__panel ws__panel--plot">
+        <canvas id="wsPlot"></canvas>
+      </div>
+    </div>
+
+    <div class="ws__controls">
+      <span class="mono mono--dim">regular  p=0</span>
+      <input type="range" id="wsSlider" min="0" max="1" step="0.001" value="0" aria-label="probabilidad de reconexión">
+      <span class="mono mono--dim">aleatoria  p=1</span>
+      <button class="btn btn--ghost btn--sm" id="wsRegen" type="button">↻ regenerar</button>
+    </div>
+
+    <div class="ws__caption mono mono--dim">
+      Zona <span style="color:#7c3aed">violeta</span>: rango pequeño
+      de <span class="mono">p</span> donde <span class="mono">L</span>
+      ya colapsó pero <span class="mono">C</span> sigue alto — el régimen
+      de <em>mundo pequeño</em>.
+    </div>
+  </div>
+</section>
+
+<section class="section section--net" id="redes-casos">
+  <div class="section__head">
+    <span class="section__index mono">§ 05</span>
+    <span class="section__kicker mono">Aplicaciones</span>
+  </div>
+
+  <h2 class="section__title">Casos · dónde nos han ayudado</h2>
+
+  <p class="prose__lede prose__lede--centered">
+    Seis dominios donde el análisis de redes ha cambiado cómo entendemos
+    y intervenimos un sistema.
+  </p>
+
+  <div class="cases" id="cases"></div>
+</section>
+
+<section class="branch-next">
+  <div class="branch-next__inner">
+    <p class="mono mono--dim">continúa explorando</p>
+    <div class="branch-next__cards">
+      <a class="branch-next__card branch-next__card--orange" href="fractal.html">
+        <span class="mono">rama I</span>
+        <span class="branch-next__name">Análisis Fractal</span>
+        <span class="branch-next__sub">la geometría de lo rugoso →</span>
+      </a>
+      <a class="branch-next__card branch-next__card--violet" href="topologia.html">
+        <span class="mono">rama II</span>
+        <span class="branch-next__name">Análisis Topológico</span>
+        <span class="branch-next__sub">la forma de los datos →</span>
+      </a>
+      <a class="branch-next__card branch-next__card--home" href="index.html">
+        <span class="mono">portada</span>
+        <span class="branch-next__name">Mapa conceptual</span>
+        <span class="branch-next__sub">volver al inicio ↗</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="foot__top">
+    <div class="foot__brand">
+      <span class="nav__logo nav__logo--lg" aria-hidden="true"></span>
+      <div>
+        <p class="foot__name">Laboratorio de Sistemas Complejos</p>
+        <p class="foot__tag">Explorando el orden oculto en el caos</p>
+      </div>
+    </div>
+    <p class="foot__credit">
+      Proyecto de retribución social — Maestría en Sistemas Complejos.
+    </p>
+  </div>
+
+  <div class="foot__grid">
+    <div class="foot__col">
+      <p class="foot__col-title mono mono--dim">Documentos · análisis fractal</p>
+      <ul class="foot__list">
+        <li>Mandelbrot, B. — <em>The Fractal Geometry of Nature</em> (1982)</li>
+        <li>Falconer, K. — <em>Fractal Geometry</em> (2014)</li>
+        <li>Mandelbrot — <em>How long is the coast of Britain?</em> · Science (1967)</li>
+        <li>Kantelhardt et al. — <em>MF-DFA</em> · Physica A (2002)</li>
+      </ul>
+    </div>
+    <div class="foot__col">
+      <p class="foot__col-title mono mono--dim">Documentos · análisis topológico</p>
+      <ul class="foot__list">
+        <li>Edelsbrunner &amp; Harer — <em>Computational Topology</em> (2010)</li>
+        <li>Hatcher, A. — <em>Algebraic Topology</em> (2002)</li>
+        <li>Carlsson — <em>Topology and data</em> · BAMS (2009)</li>
+      </ul>
+    </div>
+    <div class="foot__col">
+      <p class="foot__col-title mono mono--dim">Documentos · redes complejas</p>
+      <ul class="foot__list">
+        <li>Newman, M. — <em>Networks</em> (2018)</li>
+        <li>Barabási, A.-L. — <em>Network Science</em> (2016)</li>
+        <li>Watts, D. — <em>Six Degrees</em> (2003)</li>
+        <li>Watts &amp; Strogatz — <em>Small-world networks</em> · Nature (1998)</li>
+        <li>Barabási &amp; Albert — <em>Emergence of scaling</em> · Science (1999)</li>
+        <li>Erdős &amp; Rényi — <em>On random graphs I</em> · Publ. Math. Debrecen (1959)</li>
+      </ul>
+    </div>
+    <div class="foot__col">
+      <p class="foot__col-title mono mono--dim">Otras ramas</p>
+      <ul class="foot__list">
+        <li><a href="fractal.html" class="foot__link">→ Análisis fractal</a></li>
+        <li><a href="topologia.html" class="foot__link">→ Análisis topológico</a></li>
+        <li><a href="index.html" class="foot__link">↗ Mapa conceptual</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="foot__bottom">
+    <p class="foot__quote">
+      <em>"Six degrees of separation is not just a charming notion — it is a measurable property of the social fabric."</em><br>
+      <span class="mono mono--dim">— D. Watts, 2003</span>
+    </p>
+    <p class="foot__copy mono mono--dim">
+      © 2026 · contenido CC&nbsp;BY-SA&nbsp;4.0 · código MIT
+    </p>
+  </div>
+</footer>
+
+<script src="js/networks.js"></script>
+<script src="js/main.js"></script>
+
+</body>
+</html>

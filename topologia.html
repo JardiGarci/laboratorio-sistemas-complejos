@@ -1,0 +1,453 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Análisis Topológico · Laboratorio de Sistemas Complejos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="nav" id="nav">
+  <div class="nav__inner">
+    <a class="nav__brand" href="index.html">
+      <span class="nav__logo" aria-hidden="true"></span>
+      <span class="nav__brand-text">Lab. Sistemas Complejos</span>
+    </a>
+    <ul class="nav__links">
+      <li><a href="index.html">Mapa</a></li>
+      <li><a href="fractal.html">Análisis fractal</a></li>
+      <li><a class="is-current" href="topologia.html">Análisis topológico</a></li>
+      <li><a href="redes.html">Redes complejas</a></li>
+    </ul>
+    <div class="nav__progress" id="navProgress"></div>
+  </div>
+</nav>
+
+<header class="branch-hero branch-hero--tda">
+  <div class="branch-hero__inner">
+    <p class="branch-hero__crumb mono">
+      <a href="index.html">← mapa conceptual</a> · rama II
+    </p>
+    <h1 class="branch-hero__title">Análisis <em>Topológico</em></h1>
+    <p class="branch-hero__sub">
+      La forma de los datos. Cuántos componentes hay, cuántos hoyos,
+      cuántas cavidades — sin importar la métrica concreta que uses.
+    </p>
+    <ul class="branch-hero__toc">
+      <li><a href="#tda-intro"><span class="mono">01</span> Introducción</a></li>
+      <li><a href="#tda-simplex"><span class="mono">02</span> Complejos simpliciales</a></li>
+      <li><a href="#tda-filtration"><span class="mono">03</span> Filtración Vietoris–Rips</a></li>
+      <li><a href="#tda-homology"><span class="mono">04</span> Grupos de homología</a></li>
+      <li><a href="#tda-persistence"><span class="mono">05</span> Persistencia</a></li>
+    </ul>
+  </div>
+</header>
+
+<main>
+
+<section class="section section--tda" id="tda-intro">
+  <div class="section__head">
+    <span class="section__index mono">§ 01</span>
+    <span class="section__kicker mono">Topología de datos</span>
+  </div>
+
+  <h2 class="section__title">¿De qué forma son los datos?</h2>
+
+  <div class="prose">
+    <p class="prose__lede">
+      Imagina una nube de puntos en el plano. ¿Tiene forma de anillo? ¿De
+      ocho? ¿De tres grupos separados? Esa pregunta — <em>cuál es la
+      forma de los datos</em> — es lo que responde el análisis topológico.
+    </p>
+
+    <p>
+      La topología estudia propiedades de los objetos que sobreviven a
+      deformaciones continuas: estirar, doblar, comprimir, pero no romper.
+      Una taza de café y una rosquilla son <em>topológicamente</em> la
+      misma cosa porque cada una tiene exactamente un agujero. Lo que
+      importa no es la métrica — son los <strong>invariantes
+      topológicos</strong>.
+    </p>
+
+    <p>
+      El <strong>TDA</strong> (Topological Data Analysis) lleva esta idea
+      a conjuntos finitos de datos. Como una nube de puntos no tiene
+      "forma" por sí sola, se construye una <em>familia</em> de formas
+      conectando puntos cercanos a distintas escalas, y se rastrea
+      cuáles agujeros sobreviven a lo largo de la familia.
+    </p>
+  </div>
+</section>
+
+<section class="section section--tda" id="tda-simplex">
+  <div class="section__head">
+    <span class="section__index mono">§ 02</span>
+    <span class="section__kicker mono">Bloques fundamentales</span>
+  </div>
+
+  <h2 class="section__title">Complejos simpliciales</h2>
+
+  <div class="prose">
+    <p class="prose__lede">
+      El TDA construye sus formas con <strong>simplices</strong> —
+      generalizaciones de los triángulos a cualquier dimensión.
+    </p>
+  </div>
+
+  <div class="tda-cards">
+    <div class="tda-card">
+      <p class="tda-card__num mono">0-simplex</p>
+      <h3 class="tda-card__name">Punto</h3>
+      <div class="tda-card__viz">
+        <svg viewBox="0 0 120 80" aria-hidden="true">
+          <circle cx="60" cy="40" r="5" fill="#7c3aed"></circle>
+        </svg>
+      </div>
+      <p class="tda-card__txt">
+        El bloque base. Un vértice aislado. Cada dato observado es un 0-simplex.
+      </p>
+    </div>
+
+    <div class="tda-card">
+      <p class="tda-card__num mono">1-simplex</p>
+      <h3 class="tda-card__name">Arista</h3>
+      <div class="tda-card__viz">
+        <svg viewBox="0 0 120 80" aria-hidden="true">
+          <line x1="20" y1="40" x2="100" y2="40" stroke="#7c3aed" stroke-width="1.6"></line>
+          <circle cx="20" cy="40" r="4" fill="#7c3aed"></circle>
+          <circle cx="100" cy="40" r="4" fill="#7c3aed"></circle>
+        </svg>
+      </div>
+      <p class="tda-card__txt">
+        Une dos vértices. Codifica una relación: "estos dos puntos están
+        cerca según mi métrica".
+      </p>
+    </div>
+
+    <div class="tda-card">
+      <p class="tda-card__num mono">2-simplex</p>
+      <h3 class="tda-card__name">Triángulo</h3>
+      <div class="tda-card__viz">
+        <svg viewBox="0 0 120 80" aria-hidden="true">
+          <polygon points="60,12 18,68 102,68" fill="#7c3aed" fill-opacity="0.30" stroke="#7c3aed" stroke-width="1.4"></polygon>
+          <circle cx="60" cy="12" r="4" fill="#7c3aed"></circle>
+          <circle cx="18" cy="68" r="4" fill="#7c3aed"></circle>
+          <circle cx="102" cy="68" r="4" fill="#7c3aed"></circle>
+        </svg>
+      </div>
+      <p class="tda-card__txt">
+        Un triángulo <em>relleno</em>. Aparece cuando tres puntos son
+        mutuamente cercanos. Es la unidad clave para "tapar" agujeros.
+      </p>
+    </div>
+
+    <div class="tda-card">
+      <p class="tda-card__num mono">3-simplex</p>
+      <h3 class="tda-card__name">Tetraedro</h3>
+      <div class="tda-card__viz">
+        <svg viewBox="0 0 120 80" aria-hidden="true">
+          <g fill="#7c3aed" fill-opacity="0.18" stroke="#7c3aed" stroke-width="1.2">
+            <polygon points="60,10 18,68 102,68"></polygon>
+            <polygon points="60,10 18,68 70,48"></polygon>
+            <polygon points="60,10 70,48 102,68"></polygon>
+          </g>
+          <circle cx="60" cy="10" r="3.5" fill="#7c3aed"></circle>
+          <circle cx="18" cy="68" r="3.5" fill="#7c3aed"></circle>
+          <circle cx="102" cy="68" r="3.5" fill="#7c3aed"></circle>
+          <circle cx="70" cy="48" r="3.5" fill="#7c3aed"></circle>
+        </svg>
+      </div>
+      <p class="tda-card__txt">
+        Un sólido de cuatro caras. Captura "agujeros tridimensionales".
+        En general un <span class="mono">k</span>-simplex se forma con
+        <span class="mono">k+1</span> puntos.
+      </p>
+    </div>
+  </div>
+
+  <p class="prose">
+    Un <strong>complejo simplicial</strong> es un pegado consistente de
+    simplices: cada vez que incluimos un triángulo, también deben estar
+    sus tres aristas y sus tres vértices. La forma de un complejo
+    simplicial es lo que nos permite hablar de "agujeros".
+  </p>
+</section>
+
+<section class="section section--tda" id="tda-filtration">
+  <div class="section__head">
+    <span class="section__index mono">§ 03</span>
+    <span class="section__kicker mono">Cómo crece la forma</span>
+  </div>
+
+  <h2 class="section__title">Filtración Vietoris–Rips</h2>
+
+  <div class="prose">
+    <p class="prose__lede">
+      Una nube de puntos sola no tiene forma. La filtración construye una
+      <em>familia</em> de complejos simpliciales, indexada por una
+      escala <span class="mono">ε</span> creciente.
+    </p>
+
+    <p>
+      Concretamente, el <strong>complejo de Vietoris–Rips</strong>
+      <span class="mono">VR<sub>ε</sub>(X)</span> conecta dos puntos con
+      una arista si su distancia es ≤ ε; agrega un triángulo si tres
+      puntos son mutuamente ≤ ε; un tetraedro si cuatro lo son; y así
+      sucesivamente.
+    </p>
+
+    <p>
+      Conforme ε crece, el complejo crece — y aparecen nuevas
+      características topológicas (componentes que se fusionan, ciclos
+      que se cierran, cavidades que se tapan). La filtración es la
+      secuencia ordenada de estos cambios.
+    </p>
+  </div>
+</section>
+
+<section class="section section--tda" id="tda-homology">
+  <div class="section__head">
+    <span class="section__index mono">§ 04</span>
+    <span class="section__kicker mono">Contar agujeros</span>
+  </div>
+
+  <h2 class="section__title">Grupos de homología</h2>
+
+  <div class="prose">
+    <p class="prose__lede">
+      Los <strong>números de Betti</strong> son los invariantes que
+      cuentan agujeros de cada dimensión. Son enteros, no negativos, y
+      no dependen de cómo dibujes la forma.
+    </p>
+
+    <div class="dim-intuition">
+      <div class="dim-row">
+        <div class="dim-row__icon">
+          <svg viewBox="0 0 60 60" aria-hidden="true">
+            <circle cx="18" cy="30" r="6" fill="currentColor"></circle>
+            <circle cx="42" cy="30" r="6" fill="currentColor"></circle>
+          </svg>
+        </div>
+        <div>
+          <span class="dim-row__val mono">β₀</span>
+          <span class="dim-row__lbl">componentes conexas — "cuántas piezas separadas"</span>
+        </div>
+      </div>
+      <div class="dim-row">
+        <div class="dim-row__icon">
+          <svg viewBox="0 0 60 60" aria-hidden="true">
+            <circle cx="30" cy="30" r="18" fill="none" stroke="currentColor" stroke-width="3"></circle>
+          </svg>
+        </div>
+        <div>
+          <span class="dim-row__val mono">β₁</span>
+          <span class="dim-row__lbl">lazos / anillos — "cuántos agujeros 2D"</span>
+        </div>
+      </div>
+      <div class="dim-row dim-row--accent">
+        <div class="dim-row__icon">
+          <svg viewBox="0 0 60 60" aria-hidden="true">
+            <ellipse cx="30" cy="32" rx="20" ry="18" fill="none" stroke="currentColor" stroke-width="2.5"></ellipse>
+            <ellipse cx="30" cy="28" rx="12" ry="6" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.6"></ellipse>
+          </svg>
+        </div>
+        <div>
+          <span class="dim-row__val mono">β₂</span>
+          <span class="dim-row__lbl">cavidades — "burbujas huecas en 3D"</span>
+        </div>
+      </div>
+    </div>
+
+    <p>
+      Una <strong>esfera</strong> tiene β₀ = 1, β₁ = 0, β₂ = 1.
+      Una <strong>rosquilla</strong> (toro) tiene β₀ = 1, β₁ = 2, β₂ = 1.
+      Dos rosquillas separadas: β₀ = 2, β₁ = 4, β₂ = 2. Esto es todo lo
+      que la topología necesita saber para distinguirlas.
+    </p>
+  </div>
+</section>
+
+<section class="section section--tda" id="tda-persistence">
+  <div class="section__head">
+    <span class="section__index mono">§ 05</span>
+    <span class="section__kicker mono">Lo que sobrevive</span>
+  </div>
+
+  <h2 class="section__title">Persistencia · ¿qué barras son largas?</h2>
+
+  <div class="prose">
+    <p class="prose__lede">
+      A medida que ε crece, cada agujero <em>nace</em> en un valor y
+      <em>muere</em> en otro. Los que persisten muchas escalas son
+      reales; los que aparecen y desaparecen rápido son ruido del
+      muestreo.
+    </p>
+
+    <p>
+      Esto se codifica como un <strong>barcode</strong>: una barra por
+      cada característica, que va desde su nacimiento hasta su muerte.
+      Es la firma topológica completa de los datos.
+    </p>
+  </div>
+
+  <figure class="embed">
+    <div class="embed__frame embed__frame--tda">
+      <iframe
+        src="anim/vr_filtration.html"
+        title="Animación: filtración Vietoris–Rips y código de barras de persistencia"
+        loading="lazy"
+        scrolling="no"
+      ></iframe>
+    </div>
+    <figcaption class="embed__caption">
+      <span class="mono mono--dim">fig. 01</span>
+      A la izquierda: la nube de puntos y su complejo de Vietoris–Rips
+      conforme crece ε. A la derecha: el <strong>barcode</strong> —
+      cuando una barra <em>nace</em>, aparece un agujero; cuando
+      <em>muere</em>, se rellena. Las barras de β₁ largas son lazos reales
+      de la nube; las cortas, ruido del muestreo.
+    </figcaption>
+  </figure>
+
+  <details class="formal">
+    <summary class="formal__summary">
+      <span class="formal__chev" aria-hidden="true"></span>
+      <span>Para licenciatura — complejo VR, homología simplicial y persistencia</span>
+    </summary>
+    <div class="formal__body">
+      <p>
+        Dado un conjunto finito de puntos
+        <span class="mono">X ⊂ ℝ<sup>n</sup></span> y un parámetro
+        <span class="mono">ε ≥ 0</span>, el
+        <strong>complejo de Vietoris–Rips</strong>
+        <span class="mono">VR<sub>ε</sub>(X)</span> es el complejo simplicial
+        cuyos k-simplices son los subconjuntos de <span class="mono">k+1</span>
+        puntos con diámetro a lo más ε.
+      </p>
+      <p>
+        Para cada dimensión <span class="mono">k</span>, se construye el
+        espacio vectorial <span class="mono">C<sub>k</sub></span> generado
+        por los k-simplices, y un operador frontera
+        <span class="mono">∂<sub>k</sub>: C<sub>k</sub> → C<sub>k−1</sub></span>.
+        La <strong>k-ésima homología</strong> es:
+      </p>
+      <p class="formal__eq mono">
+        H<sub>k</sub> = ker(∂<sub>k</sub>) / im(∂<sub>k+1</sub>)
+      </p>
+      <p>
+        El número de Betti <span class="mono">β<sub>k</sub> = dim H<sub>k</sub></span>
+        cuenta los <em>agujeros k-dimensionales</em>. La
+        <strong>homología persistente</strong> rastrea cómo cambian estos
+        agujeros a lo largo de la filtración
+        <span class="mono">VR<sub>ε</sub>(X) ↪ VR<sub>ε′</sub>(X)</span>
+        para <span class="mono">ε ≤ ε′</span>. El resultado se codifica en
+        el <strong>diagrama de persistencia</strong> o
+        <strong>barcode</strong>.
+      </p>
+      <p class="formal__ref mono mono--dim">
+        ref. Edelsbrunner & Harer — <em>Computational Topology: An
+        Introduction</em>, AMS (2010). Carlsson — <em>Topology and data</em>,
+        BAMS (2009).
+      </p>
+    </div>
+  </details>
+</section>
+
+<section class="branch-next">
+  <div class="branch-next__inner">
+    <p class="mono mono--dim">continúa explorando</p>
+    <div class="branch-next__cards">
+      <a class="branch-next__card branch-next__card--orange" href="fractal.html">
+        <span class="mono">rama I</span>
+        <span class="branch-next__name">Análisis Fractal</span>
+        <span class="branch-next__sub">la geometría de lo rugoso →</span>
+      </a>
+      <a class="branch-next__card branch-next__card--cyan" href="redes.html">
+        <span class="mono">rama III</span>
+        <span class="branch-next__name">Redes Complejas</span>
+        <span class="branch-next__sub">arquitectura de las interacciones →</span>
+      </a>
+      <a class="branch-next__card branch-next__card--home" href="index.html">
+        <span class="mono">portada</span>
+        <span class="branch-next__name">Mapa conceptual</span>
+        <span class="branch-next__sub">volver al inicio ↗</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="foot__top">
+    <div class="foot__brand">
+      <span class="nav__logo nav__logo--lg" aria-hidden="true"></span>
+      <div>
+        <p class="foot__name">Laboratorio de Sistemas Complejos</p>
+        <p class="foot__tag">Explorando el orden oculto en el caos</p>
+      </div>
+    </div>
+    <p class="foot__credit">
+      Proyecto de retribución social — Maestría en Sistemas Complejos.
+    </p>
+  </div>
+
+  <div class="foot__grid">
+    <div class="foot__col">
+      <p class="foot__col-title mono mono--dim">Documentos · análisis fractal</p>
+      <ul class="foot__list">
+        <li>Mandelbrot, B. — <em>The Fractal Geometry of Nature</em> (1982)</li>
+        <li>Falconer, K. — <em>Fractal Geometry</em> (2014)</li>
+        <li>Schroeder, M. — <em>Fractals, Chaos, Power Laws</em> (1991)</li>
+        <li>Mandelbrot — <em>How long is the coast of Britain?</em> · Science (1967)</li>
+        <li>Kantelhardt et al. — <em>MF-DFA</em> · Physica A (2002)</li>
+      </ul>
+    </div>
+    <div class="foot__col">
+      <p class="foot__col-title mono mono--dim">Documentos · análisis topológico</p>
+      <ul class="foot__list">
+        <li>Edelsbrunner &amp; Harer — <em>Computational Topology</em> (2010)</li>
+        <li>Hatcher, A. — <em>Algebraic Topology</em> (2002)</li>
+        <li>Ghrist, R. — <em>Elementary Applied Topology</em> (2014)</li>
+        <li>Carlsson — <em>Topology and data</em> · BAMS (2009)</li>
+        <li>Edelsbrunner et al. — <em>Topological persistence</em> · FOCS (2000)</li>
+      </ul>
+    </div>
+    <div class="foot__col">
+      <p class="foot__col-title mono mono--dim">Documentos · redes complejas</p>
+      <ul class="foot__list">
+        <li>Newman, M. — <em>Networks</em> (2018)</li>
+        <li>Barabási, A.-L. — <em>Network Science</em> (2016)</li>
+        <li>Watts &amp; Strogatz — <em>Small-world networks</em> · Nature (1998)</li>
+        <li>Barabási &amp; Albert — <em>Emergence of scaling</em> · Science (1999)</li>
+      </ul>
+    </div>
+    <div class="foot__col">
+      <p class="foot__col-title mono mono--dim">Otras ramas</p>
+      <ul class="foot__list">
+        <li><a href="fractal.html" class="foot__link">→ Análisis fractal</a></li>
+        <li><a href="redes.html" class="foot__link">→ Redes complejas</a></li>
+        <li><a href="index.html" class="foot__link">↗ Mapa conceptual</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="foot__bottom">
+    <p class="foot__quote">
+      <em>"Topology is the most basic property of any geometric object."</em><br>
+      <span class="mono mono--dim">— G. Carlsson, 2009</span>
+    </p>
+    <p class="foot__copy mono mono--dim">
+      © 2026 · contenido CC&nbsp;BY-SA&nbsp;4.0 · código MIT
+    </p>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+
+</body>
+</html>

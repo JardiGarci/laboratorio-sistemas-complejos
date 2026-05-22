@@ -98,7 +98,10 @@ em { font-style: italic; font-family: var(--ff-display); font-weight: 500; }
   font-size: 16px;
   letter-spacing: -0.01em;
   white-space: nowrap;
+  color: var(--ink);
 }
+.nav__brand:hover .nav__brand-text { color: var(--violet); }
+.nav__brand-text { transition: color 160ms; }
 .nav__logo {
   width: 22px; height: 22px;
   background:
@@ -1444,6 +1447,225 @@ canvas { background-color: transparent; }
   letter-spacing: 0.04em;
   margin: 4px 0 0;
 }
+
+/* ============================================================
+   HERO — full-bleed concept-map variant for index.html
+============================================================ */
+.hero--full {
+  height: 100vh;
+  min-height: 700px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  padding: 14px 0 16px;
+  overflow: hidden;
+}
+.hero--full .hero__map {
+  height: 100%;
+  min-height: 0;
+}
+.hero--full .hero__map-wrap {
+  flex: 1;
+  min-height: 0;
+  display: flex; flex-direction: column;
+}
+.hero__hint {
+  margin: 6px 0 0;
+  font-size: 12px;
+  font-style: italic;
+}
+
+@media (max-width: 760px) {
+  .hero--full {
+    height: auto;
+    min-height: 100vh;
+  }
+  .hero--full .hero__map { height: 480px; }
+}
+
+/* ============================================================
+   BRANCH HERO — header at the top of each branch page
+============================================================ */
+.branch-hero {
+  background: linear-gradient(180deg, #14131a 0%, #1d1c25 100%);
+  color: #f4eedf;
+  padding: 100px clamp(24px, 5vw, 80px) 70px;
+  position: relative;
+  overflow: hidden;
+}
+.branch-hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  pointer-events: none;
+}
+.branch-hero--fractal::before {
+  background:
+    radial-gradient(circle at 78% 22%, rgba(234,126,58,0.22), transparent 55%),
+    radial-gradient(circle at 18% 78%, rgba(124,58,237,0.10), transparent 55%);
+}
+.branch-hero--tda::before {
+  background:
+    radial-gradient(circle at 78% 22%, rgba(124,58,237,0.28), transparent 55%),
+    radial-gradient(circle at 18% 78%, rgba(230,57,144,0.12), transparent 55%);
+}
+.branch-hero--net::before {
+  background:
+    radial-gradient(circle at 78% 22%, rgba(15,181,196,0.26), transparent 55%),
+    radial-gradient(circle at 18% 78%, rgba(234,126,58,0.10), transparent 55%);
+}
+.branch-hero__inner {
+  position: relative;
+  max-width: var(--col-bleed);
+  margin: 0 auto;
+}
+.branch-hero__crumb {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11px;
+  color: rgba(244,238,223,0.55);
+  letter-spacing: 0.08em;
+  margin-bottom: 18px;
+}
+.branch-hero__crumb a {
+  color: rgba(244,238,223,0.85);
+  border-bottom: 1px solid rgba(244,238,223,0.25);
+  transition: border-color 160ms, color 160ms;
+}
+.branch-hero__crumb a:hover { color: #fff; border-bottom-color: #fff; }
+
+.branch-hero__title {
+  font-family: var(--ff-display);
+  font-weight: 500;
+  font-size: clamp(48px, 8vw, 102px);
+  line-height: 0.96;
+  letter-spacing: -0.025em;
+  margin: 0 0 24px;
+  text-wrap: balance;
+}
+.branch-hero__title em {
+  font-family: var(--ff-display);
+  font-style: italic;
+  font-weight: 500;
+}
+.branch-hero--fractal .branch-hero__title em {
+  background: linear-gradient(90deg, #ffd9a8 0%, #ea7e3a 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.branch-hero--tda .branch-hero__title em {
+  background: linear-gradient(90deg, #c4b5fd 0%, #7c3aed 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.branch-hero--net .branch-hero__title em {
+  background: linear-gradient(90deg, #67e8f9 0%, #0fb5c4 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.branch-hero__sub {
+  font-family: var(--ff-display);
+  font-style: italic;
+  font-size: clamp(18px, 2vw, 24px);
+  line-height: 1.45;
+  color: rgba(244,238,223,0.75);
+  max-width: 640px;
+  margin: 0 0 36px;
+}
+.branch-hero__toc {
+  list-style: none; padding: 0; margin: 0;
+  display: flex; flex-wrap: wrap; gap: 10px;
+  border-top: 1px solid rgba(244,238,223,0.12);
+  padding-top: 28px;
+}
+.branch-hero__toc a {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 9px 16px;
+  border: 1px solid rgba(244,238,223,0.18);
+  border-radius: 99px;
+  font-size: 13.5px;
+  color: rgba(244,238,223,0.88);
+  transition: background 160ms, border-color 160ms, color 160ms;
+}
+.branch-hero__toc a:hover {
+  background: rgba(244,238,223,0.08);
+  border-color: rgba(244,238,223,0.45);
+  color: #fff;
+}
+.branch-hero__toc .mono {
+  color: rgba(244,238,223,0.45);
+  font-size: 11px;
+}
+
+/* ============================================================
+   BRANCH NEXT — cards at the end of each branch page
+============================================================ */
+.branch-next {
+  background: var(--bg-warm);
+  padding: 70px clamp(24px, 5vw, 80px) 90px;
+}
+.branch-next__inner {
+  max-width: var(--col-bleed);
+  margin: 0 auto;
+}
+.branch-next__inner > .mono--dim {
+  margin: 0 0 18px;
+}
+.branch-next__cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+.branch-next__card {
+  display: flex; flex-direction: column; gap: 6px;
+  padding: 26px 26px 28px;
+  background: var(--bg-card);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  position: relative;
+  overflow: hidden;
+  transition: transform 220ms cubic-bezier(.2,.7,.3,1), box-shadow 220ms, border-color 220ms;
+}
+.branch-next__card::after {
+  content: '';
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 4px;
+  background: var(--ink-4);
+}
+.branch-next__card--orange::after { background: linear-gradient(90deg, #ffd9a8, #ea7e3a); }
+.branch-next__card--violet::after { background: linear-gradient(90deg, #c4b5fd, #7c3aed); }
+.branch-next__card--cyan::after   { background: linear-gradient(90deg, #67e8f9, #0fb5c4); }
+.branch-next__card--home::after   { background: linear-gradient(90deg, #ea7e3a, #7c3aed, #0fb5c4); }
+
+.branch-next__card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lift);
+  border-color: var(--ink-4);
+}
+.branch-next__card .mono {
+  font-size: 11px;
+  color: var(--ink-3);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.branch-next__name {
+  font-family: var(--ff-display);
+  font-weight: 500;
+  font-size: 24px;
+  line-height: 1.1;
+  color: var(--ink);
+  letter-spacing: -0.015em;
+}
+.branch-next__sub {
+  font-size: 14px;
+  color: var(--ink-3);
+  margin-top: 4px;
+}
+
+/* keep section--multifractal / section--tda from spanning full-bleed
+   because they're inside <main>, not the top-level page anymore */
+.section--multifractal { background: transparent; }
+.section--tda          { background: transparent; }
+.section--nature       { background: transparent; }
+.section--map          { background: transparent; }
 
 /* selection */
 ::selection { background: var(--violet); color: #fff; }

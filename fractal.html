@@ -1,0 +1,552 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Análisis Fractal · Laboratorio de Sistemas Complejos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ============================================================
+     NAV — sticky top (shared)
+============================================================ -->
+<nav class="nav" id="nav">
+  <div class="nav__inner">
+    <a class="nav__brand" href="index.html">
+      <span class="nav__logo" aria-hidden="true"></span>
+      <span class="nav__brand-text">Lab. Sistemas Complejos</span>
+    </a>
+    <ul class="nav__links">
+      <li><a href="index.html">Mapa</a></li>
+      <li><a class="is-current" href="fractal.html">Análisis fractal</a></li>
+      <li><a href="topologia.html">Análisis topológico</a></li>
+      <li><a href="redes.html">Redes complejas</a></li>
+    </ul>
+    <div class="nav__progress" id="navProgress"></div>
+  </div>
+</nav>
+
+<!-- ============================================================
+     BRANCH HEADER — orange (fractal)
+============================================================ -->
+<header class="branch-hero branch-hero--fractal">
+  <div class="branch-hero__inner">
+    <p class="branch-hero__crumb mono">
+      <a href="index.html">← mapa conceptual</a> · rama I
+    </p>
+    <h1 class="branch-hero__title">Análisis <em>Fractal</em></h1>
+    <p class="branch-hero__sub">
+      Una geometría para lo rugoso. Para todo lo que no se vuelve liso al
+      mirarlo de cerca: costas, pulmones, nubes, sismos, mercados.
+    </p>
+    <ul class="branch-hero__toc">
+      <li><a href="#fractales"><span class="mono">01</span> ¿Qué es un fractal?</a></li>
+      <li><a href="#dimension"><span class="mono">02</span> Dimensión fractal</a></li>
+      <li><a href="#galeria"><span class="mono">03</span> Fractales sintéticos</a></li>
+      <li><a href="#naturaleza"><span class="mono">04</span> En la naturaleza</a></li>
+      <li><a href="#multifractal"><span class="mono">05</span> Análisis multifractal</a></li>
+    </ul>
+  </div>
+</header>
+
+<main>
+
+<!-- ============================================================
+     01 · INTRO
+============================================================ -->
+<section class="section section--intro" id="fractales">
+  <div class="section__head">
+    <span class="section__index mono">§ 01</span>
+    <span class="section__kicker mono">Introducción</span>
+  </div>
+
+  <h2 class="section__title">¿Qué es un fractal?</h2>
+
+  <div class="prose">
+    <p class="prose__lede">
+      Un fractal es una <em>forma rugosa</em> — una figura que no se vuelve
+      lisa cuando te acercas. Donde una circunferencia, vista de muy cerca,
+      termina pareciendo una recta, un fractal sigue siendo igual de irregular
+      sin importar cuánto amplifiques.
+    </p>
+
+    <p>
+      La palabra la acuñó Benoît Mandelbrot en 1975. Viene del latín
+      <em>fractus</em> — quebrado, fragmentado — y describe objetos que comparten
+      una propiedad sorprendente: <strong>autosemejanza</strong>. Cada pequeño
+      trozo se parece, en escala, al todo del que forma parte.
+    </p>
+
+    <figure class="callout callout--analogy">
+      <div class="callout__strip"></div>
+      <div class="callout__body">
+        <p class="mono mono--dim">analogía visual</p>
+        <p>
+          Un árbol no está hecho de un tronco con hojas. Está hecho de
+          un tronco que se divide en ramas, que se dividen en ramas
+          más pequeñas, que se dividen en ramitas — y cada nivel
+          repite la lógica del nivel anterior. <strong>Eso es un fractal.</strong>
+        </p>
+      </div>
+    </figure>
+
+    <p>
+      Lewis Fry Richardson, en 1961, hizo una pregunta aparentemente trivial:
+      ¿cuánto mide la costa de Gran Bretaña? Esperaba un número. Encontró,
+      en cambio, una <em>paradoja</em>: la respuesta depende del tamaño de la
+      regla. Mientras más fina la regla, más detalles encuentra, y mayor
+      la longitud — sin un límite claro.
+    </p>
+  </div>
+
+  <figure class="embed">
+    <div class="embed__frame embed__frame--coast">
+      <iframe
+        src="anim/costa_bretana.html"
+        title="Animación: paradoja de la costa de Bretaña (Richardson, 1961)"
+        loading="lazy"
+        scrolling="no"
+      ></iframe>
+    </div>
+    <figcaption class="embed__caption">
+      <span class="mono mono--dim">fig. 01</span>
+      Animación interactiva — desliza para reducir el tamaño de la regla
+      <strong>ε</strong>. La longitud medida <strong>L(ε)</strong> crece
+      sin parar, y la pendiente en escala log–log revela una dimensión
+      no entera: <strong>D ≈ 1.25</strong>.
+    </figcaption>
+  </figure>
+
+  <div class="prose">
+    <p>
+      Richardson había descubierto, sin saberlo aún, que la costa no es una
+      línea de dimensión 1. Es algo entre una línea y una superficie. Esa
+      "cosa intermedia" — un número entre dimensiones enteras — es lo que
+      ahora llamamos <strong>dimensión fractal</strong>.
+    </p>
+  </div>
+</section>
+
+<!-- ============================================================
+     02 · DIMENSIÓN
+============================================================ -->
+<section class="section section--dim" id="dimension">
+  <div class="section__head">
+    <span class="section__index mono">§ 02</span>
+    <span class="section__kicker mono">Medición</span>
+  </div>
+
+  <h2 class="section__title">¿Cómo medimos un fractal?</h2>
+
+  <div class="prose">
+    <p class="prose__lede">
+      Si la longitud no funciona, ¿qué sí? La intuición es ésta:
+      contar <em>cuánto espacio</em> ocupa la forma a medida que
+      cambiamos la escala con la que miramos.
+    </p>
+
+    <div class="dim-intuition">
+      <div class="dim-row">
+        <div class="dim-row__icon">
+          <svg viewBox="0 0 60 60" aria-hidden="true">
+            <line x1="6" y1="30" x2="54" y2="30" stroke="currentColor" stroke-width="2"></line>
+          </svg>
+        </div>
+        <div>
+          <span class="dim-row__val mono">D = 1</span>
+          <span class="dim-row__lbl">una recta — ocupa una sola dimensión</span>
+        </div>
+      </div>
+      <div class="dim-row">
+        <div class="dim-row__icon">
+          <svg viewBox="0 0 60 60" aria-hidden="true">
+            <rect x="10" y="10" width="40" height="40" fill="currentColor" opacity="0.18"></rect>
+            <rect x="10" y="10" width="40" height="40" fill="none" stroke="currentColor" stroke-width="2"></rect>
+          </svg>
+        </div>
+        <div>
+          <span class="dim-row__val mono">D = 2</span>
+          <span class="dim-row__lbl">un cuadrado — llena el plano</span>
+        </div>
+      </div>
+      <div class="dim-row dim-row--accent">
+        <div class="dim-row__icon">
+          <svg viewBox="0 0 60 60" aria-hidden="true">
+            <path d="M6 50 L18 35 L24 42 L36 24 L42 32 L54 14"
+                  fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linejoin="round" stroke-linecap="round"></path>
+          </svg>
+        </div>
+        <div>
+          <span class="dim-row__val mono">D ≈ 1.26</span>
+          <span class="dim-row__lbl">una costa, un copo, un rayo — <em>entre</em> uno y dos</span>
+        </div>
+      </div>
+    </div>
+
+    <p>
+      La forma más concreta de calcular esto se llama
+      <strong>box-counting</strong>, o conteo de cajas. Cubrimos el fractal
+      con una cuadrícula de cajitas de tamaño <span class="mono">ε</span>,
+      contamos cuántas cajas tocan a la figura, y repetimos haciendo
+      <span class="mono">ε</span> cada vez más pequeño. La forma en que
+      el número de cajas crece <em>cuando</em> achicamos la malla
+      es lo que define la dimensión.
+    </p>
+  </div>
+
+  <div class="bc">
+    <div class="bc__head">
+      <div>
+        <p class="bc__title">Box-counting interactivo</p>
+        <p class="bc__sub mono mono--dim">curva de Koch · D teórica = log 4 / log 3 ≈ 1.2619</p>
+      </div>
+      <div class="bc__readout">
+        <div class="bc__readout-block">
+          <span class="mono mono--dim">ε</span>
+          <span class="mono mono--big" id="bcEps">—</span>
+        </div>
+        <div class="bc__readout-block">
+          <span class="mono mono--dim">N(ε)</span>
+          <span class="mono mono--big" id="bcN">—</span>
+        </div>
+        <div class="bc__readout-block bc__readout-block--accent">
+          <span class="mono mono--dim">D estimada</span>
+          <span class="mono mono--big" id="bcD">—</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="bc__panels">
+      <div class="bc__panel"><canvas id="bcCanvas"></canvas></div>
+      <div class="bc__panel"><canvas id="bcPlot"></canvas></div>
+    </div>
+
+    <div class="bc__controls">
+      <span class="mono mono--dim">malla gruesa</span>
+      <input type="range" id="bcSlider" min="0" max="9" step="1" value="0" aria-label="tamaño de la malla">
+      <span class="mono mono--dim">malla fina</span>
+      <button class="btn btn--ghost btn--sm" id="bcAuto" type="button">▶ auto</button>
+    </div>
+  </div>
+
+  <details class="formal">
+    <summary class="formal__summary">
+      <span class="formal__chev" aria-hidden="true"></span>
+      <span>Para licenciatura — definición formal de Hausdorff y método de box-counting</span>
+    </summary>
+    <div class="formal__body">
+      <p>
+        La dimensión de Hausdorff se define usando coberturas: dado un conjunto
+        <span class="mono">F ⊂ ℝⁿ</span>, consideramos coberturas de
+        <span class="mono">F</span> por familias numerables de conjuntos
+        <span class="mono">{Uᵢ}</span> con diámetro
+        <span class="mono">|Uᵢ| ≤ δ</span>. Para cada <span class="mono">s ≥ 0</span>
+        se define la medida exterior <span class="mono">s</span>-dimensional:
+      </p>
+      <p class="formal__eq mono">
+        ℋ<sup>s</sup>(F) = lim<sub>δ→0</sub> inf { Σᵢ |Uᵢ|<sup>s</sup> : {Uᵢ} cubre F, |Uᵢ| ≤ δ }
+      </p>
+      <p>
+        Existe un valor crítico de <span class="mono">s</span>, llamado
+        <strong>dimensión de Hausdorff</strong>
+        <span class="mono">dim<sub>H</sub> F</span>, donde
+        <span class="mono">ℋ<sup>s</sup>(F)</span> salta de
+        <span class="mono">∞</span> a <span class="mono">0</span>.
+      </p>
+      <p>
+        En la práctica, esto rara vez se calcula directamente. Se usa la
+        <strong>dimensión de box-counting</strong>, que coincide con
+        Hausdorff para muchos fractales auto-semejantes. Si
+        <span class="mono">N(ε)</span> es el número mínimo de cajas de lado
+        <span class="mono">ε</span> necesarias para cubrir <span class="mono">F</span>:
+      </p>
+      <p class="formal__eq mono">
+        dim<sub>B</sub> F = lim<sub>ε→0</sub> (log N(ε) / log (1/ε))
+      </p>
+      <p>
+        Es decir: graficamos <span class="mono">log N(ε)</span> contra
+        <span class="mono">log (1/ε)</span> y ajustamos una recta. La
+        <em>pendiente</em> de esa recta es la dimensión estimada.
+      </p>
+      <p class="formal__ref mono mono--dim">
+        ref. Falconer, K. — <em>Fractal Geometry</em>, Wiley (1990), cap. 2–3.
+      </p>
+    </div>
+  </details>
+</section>
+
+<!-- ============================================================
+     03 · GALERÍA
+============================================================ -->
+<section class="section section--gallery" id="galeria">
+  <div class="section__head">
+    <span class="section__index mono">§ 03</span>
+    <span class="section__kicker mono">Catálogo</span>
+  </div>
+
+  <h2 class="section__title">Fractales sintéticos</h2>
+
+  <p class="prose__lede prose__lede--centered">
+    Seis construcciones canónicas, todas dibujadas en vivo en tu navegador.
+    Haz clic en cualquiera para ver cómo se calcula su dimensión.
+  </p>
+
+  <div class="gallery" id="gallery"></div>
+</section>
+
+<!-- ============================================================
+     04 · NATURALEZA
+============================================================ -->
+<section class="section section--nature" id="naturaleza">
+  <div class="section__head">
+    <span class="section__index mono">§ 04</span>
+    <span class="section__kicker mono">En el mundo</span>
+  </div>
+
+  <h2 class="section__title">Fractales en la naturaleza</h2>
+
+  <p class="prose__lede prose__lede--centered">
+    No es una metáfora — la geometría fractal aparece, medible y reproducible,
+    en sistemas físicos, biológicos y sociales.
+  </p>
+
+  <div class="nature" id="nature"></div>
+</section>
+
+<!-- ============================================================
+     05 · MULTIFRACTAL
+============================================================ -->
+<section class="section section--multifractal" id="multifractal">
+  <div class="section__head">
+    <span class="section__index mono">§ 05</span>
+    <span class="section__kicker mono">Generalización</span>
+  </div>
+
+  <h2 class="section__title">Análisis multifractal</h2>
+
+  <div class="prose">
+    <p class="prose__lede">
+      Un objeto monofractal tiene <em>una sola</em> dimensión. Pero la
+      mayoría de las cosas reales — turbulencia, lluvia, señales cerebrales,
+      precios — no son tan homogéneas: la rugosidad varía de un punto a otro.
+      Se necesita un <strong>espectro</strong> de dimensiones, no una sola.
+    </p>
+
+    <p>
+      El análisis multifractal asocia a cada lugar de la señal un
+      <strong>exponente local de Hölder</strong>
+      <span class="mono">α</span>, que mide qué tan rugoso es el objeto
+      justo ahí. La función <span class="mono">f(α)</span> registra
+      <em>cuánto soporte</em> (qué dimensión fractal) tiene el conjunto de
+      puntos con cada valor de α.
+    </p>
+
+    <div class="why-grid">
+      <div class="why">
+        <p class="mono mono--dim">qué cambia</p>
+        <p><strong>Una dimensión → un espectro.</strong> Pasamos de un número escalar a una curva en forma de campana.</p>
+      </div>
+      <div class="why">
+        <p class="mono mono--dim">cómo se ve</p>
+        <p>Una curva <span class="mono">f(α)</span> ancha indica un objeto multifractal rico; angosta, casi monofractal.</p>
+      </div>
+      <div class="why">
+        <p class="mono mono--dim">para qué sirve</p>
+        <p>Distingue patrones que tienen la <em>misma</em> dimensión fractal pero <em>textura</em> distinta — clave en imagen médica, sismos, finanzas.</p>
+      </div>
+    </div>
+
+    <p>
+      La animación de abajo construye una <strong>cascada binomial</strong>:
+      un proceso multiplicativo que reparte una unidad de masa de forma
+      asimétrica entre subcuadrantes. La asimetría <span class="mono">p₀</span>
+      controla qué tan multifractal es el resultado — y cómo se abre el
+      espectro <span class="mono">f(α)</span>.
+    </p>
+  </div>
+
+  <figure class="embed">
+    <div class="embed__frame embed__frame--tall">
+      <iframe
+        src="anim/multifractal.html"
+        title="Animación: cascada binomial y espectro multifractal f(α)"
+        loading="lazy"
+        scrolling="no"
+      ></iframe>
+    </div>
+    <figcaption class="embed__caption">
+      <span class="mono mono--dim">fig. 02</span>
+      Cascada binomial 2D — desliza <strong>p₀</strong> entre 0.5 (uniforme,
+      sin estructura) y 0.95 (extremo multifractal). La textura cambia
+      visiblemente y el espectro <strong>f(α)</strong> se ensancha:
+      <strong>Δα = α<sub>max</sub> − α<sub>min</sub></strong> es la firma
+      cuantitativa del comportamiento multifractal.
+    </figcaption>
+  </figure>
+
+  <details class="formal">
+    <summary class="formal__summary">
+      <span class="formal__chev" aria-hidden="true"></span>
+      <span>Para licenciatura — formalismo de momentos, MF-DFA y dualidad τ(q) ↔ f(α)</span>
+    </summary>
+    <div class="formal__body">
+      <p>
+        Sea <span class="mono">μ</span> una medida de probabilidad sobre
+        <span class="mono">[0,1]<sup>d</sup></span>. Cubrimos el soporte con
+        cajas de lado <span class="mono">ε</span> y definimos la función de
+        partición:
+      </p>
+      <p class="formal__eq mono">
+        Z(q, ε) = Σᵢ μᵢ(ε)<sup>q</sup>  ~  ε<sup>τ(q)</sup>
+      </p>
+      <p>
+        Para una medida monofractal, <span class="mono">τ(q)</span> es lineal
+        en <span class="mono">q</span>. Para un multifractal, es cóncava.
+        El espectro singular se obtiene por <strong>transformada de
+        Legendre</strong>:
+      </p>
+      <p class="formal__eq mono">
+        α(q) = dτ/dq      ·      f(α) = q · α(q) − τ(q)
+      </p>
+      <p>
+        Para una <strong>cascada binomial</strong> con pesos
+        <span class="mono">(p₀, p₁ = 1 − p₀)</span> en 1D:
+      </p>
+      <p class="formal__eq mono">
+        τ(q) = − log<sub>2</sub>(p₀<sup>q</sup> + p₁<sup>q</sup>)
+      </p>
+      <p>
+        En señales temporales no estacionarias se usa
+        <strong>MF-DFA</strong> (Multifractal Detrended Fluctuation Analysis,
+        Kantelhardt et al. 2002): se eliminan tendencias polinomiales por
+        ventanas, se calcula la fluctuación
+        <span class="mono">F<sub>q</sub>(s)</span> a escala
+        <span class="mono">s</span>, y se ajusta una ley de potencia
+        <span class="mono">F<sub>q</sub>(s) ~ s<sup>h(q)</sup></span>.
+        Luego <span class="mono">τ(q) = q·h(q) − 1</span>.
+      </p>
+      <p class="formal__ref mono mono--dim">
+        ref. Kantelhardt, J. et al. — <em>Multifractal detrended fluctuation
+        analysis of nonstationary time series</em>, Physica A (2002).
+      </p>
+    </div>
+  </details>
+</section>
+
+<!-- ============================================================
+     NEXT — siguiente rama
+============================================================ -->
+<section class="branch-next">
+  <div class="branch-next__inner">
+    <p class="mono mono--dim">continúa explorando</p>
+    <div class="branch-next__cards">
+      <a class="branch-next__card branch-next__card--violet" href="topologia.html">
+        <span class="mono">rama II</span>
+        <span class="branch-next__name">Análisis Topológico</span>
+        <span class="branch-next__sub">la forma de los datos →</span>
+      </a>
+      <a class="branch-next__card branch-next__card--cyan" href="redes.html">
+        <span class="mono">rama III</span>
+        <span class="branch-next__name">Redes Complejas</span>
+        <span class="branch-next__sub">arquitectura de las interacciones →</span>
+      </a>
+      <a class="branch-next__card branch-next__card--home" href="index.html">
+        <span class="mono">portada</span>
+        <span class="branch-next__name">Mapa conceptual</span>
+        <span class="branch-next__sub">volver al inicio ↗</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ============================================================
+     FOOTER (shared)
+============================================================ -->
+<footer class="foot">
+  <div class="foot__top">
+    <div class="foot__brand">
+      <span class="nav__logo nav__logo--lg" aria-hidden="true"></span>
+      <div>
+        <p class="foot__name">Laboratorio de Sistemas Complejos</p>
+        <p class="foot__tag">Explorando el orden oculto en el caos</p>
+      </div>
+    </div>
+    <p class="foot__credit">
+      Proyecto de retribución social — Maestría en Sistemas Complejos.
+      Materiales abiertos para uso docente y de divulgación.
+    </p>
+  </div>
+
+  <div class="foot__grid">
+    <div class="foot__col">
+      <p class="foot__col-title mono mono--dim">Documentos · análisis fractal</p>
+      <ul class="foot__list">
+        <li>Mandelbrot, B. — <em>The Fractal Geometry of Nature</em> (1982)</li>
+        <li>Falconer, K. — <em>Fractal Geometry</em> (2014)</li>
+        <li>Schroeder, M. — <em>Fractals, Chaos, Power Laws</em> (1991)</li>
+        <li>Strogatz, S. — <em>Nonlinear Dynamics and Chaos</em> (2014)</li>
+        <li>Mandelbrot — <em>How long is the coast of Britain?</em> · Science (1967)</li>
+        <li>Kantelhardt et al. — <em>MF-DFA</em> · Physica A (2002)</li>
+        <li>Hurst — <em>Long-term storage</em> · Trans. ASCE (1951)</li>
+      </ul>
+    </div>
+    <div class="foot__col">
+      <p class="foot__col-title mono mono--dim">Documentos · análisis topológico</p>
+      <ul class="foot__list">
+        <li>Edelsbrunner &amp; Harer — <em>Computational Topology</em> (2010)</li>
+        <li>Hatcher, A. — <em>Algebraic Topology</em> (2002)</li>
+        <li>Ghrist, R. — <em>Elementary Applied Topology</em> (2014)</li>
+        <li>Carlsson — <em>Topology and data</em> · BAMS (2009)</li>
+        <li>Edelsbrunner et al. — <em>Topological persistence</em> · FOCS (2000)</li>
+      </ul>
+    </div>
+    <div class="foot__col">
+      <p class="foot__col-title mono mono--dim">Documentos · redes complejas</p>
+      <ul class="foot__list">
+        <li>Newman, M. — <em>Networks</em> (2018)</li>
+        <li>Barabási, A.-L. — <em>Network Science</em> (2016)</li>
+        <li>Watts, D. — <em>Six Degrees</em> (2003)</li>
+        <li>Watts &amp; Strogatz — <em>Small-world networks</em> · Nature (1998)</li>
+        <li>Barabási &amp; Albert — <em>Emergence of scaling</em> · Science (1999)</li>
+        <li>Erdős &amp; Rényi — <em>On random graphs</em> · Publ. Math. (1959)</li>
+      </ul>
+    </div>
+    <div class="foot__col">
+      <p class="foot__col-title mono mono--dim">Otras ramas</p>
+      <ul class="foot__list">
+        <li><a href="topologia.html" class="foot__link">→ Análisis topológico</a></li>
+        <li><a href="redes.html" class="foot__link">→ Redes complejas</a></li>
+        <li><a href="index.html" class="foot__link">↗ Mapa conceptual</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="foot__bottom">
+    <p class="foot__quote">
+      <em>"Las nubes no son esferas, las montañas no son conos, las costas no son
+      círculos."</em><br>
+      <span class="mono mono--dim">— B. Mandelbrot, 1982</span>
+    </p>
+    <p class="foot__copy mono mono--dim">
+      © 2026 · contenido CC&nbsp;BY-SA&nbsp;4.0 · código MIT
+    </p>
+  </div>
+</footer>
+
+<!-- ============================================================
+     SCRIPTS
+============================================================ -->
+<script src="js/fractals.js"></script>
+<script src="js/boxcounting.js"></script>
+<script src="js/nature.js"></script>
+<script src="js/main.js"></script>
+
+</body>
+</html>
